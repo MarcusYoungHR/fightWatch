@@ -29,12 +29,23 @@ var transposeName = function(name) {
   return butt;
 }
 
-app.get('/search', function (req, res) {
-  
+
+/*
   sherdog.getFighter(req.query.fighter, function(data) {
     insertFighter(data).then((data) => {
       res.end()
     });
+  })
+*/
+app.get('/search', function (req, res) {
+  var string = transposeName(req.query.fighter);
+  request(`https://www.googleapis.com/customsearch/v1?key=AIzaSyAgLmwFLMuqANxoLxNVrILaslMuNUy9DF8&cx=007218699401475344710:xatgqbhqag0&q=${string}`, function(err, response, body) {
+    var url = JSON.parse(body).items[0].link;
+    sherdog.getFighter(url, function(data) {
+      insertFighter(data).then((data) => {
+        res.end()
+      });
+    })
   })
 });
 
