@@ -54,9 +54,8 @@ class App extends React.Component {
   }
 
   onClick() {
-    console.log(this.state);
-    this.setState({
-      test: this.state.test + 1
+    $.ajax({
+      url: '/test'
     })
   }
 
