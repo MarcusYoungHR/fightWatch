@@ -1,33 +1,36 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
-//import List from './components/List.jsx';
+import List from './components/List.jsx';
+import '../dist/styles.css'
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      items: [],
+      fighters: [],
       fighter: '',
-      test: ''
+      test: 0
     }
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.onClick = this.onClick.bind(this);
+    this.removeHandler = this.removeHandler.bind(this);
   }
 
   componentDidMount() {
-    // $.ajax({
-    //   url: '/items',
-    //   success: (data) => {
-    //     this.setState({
-    //       items: data
-    //     })
-    //   },
-    //   error: (err) => {
-    //     console.log('err', err);
-    //   }
-    // });
+    $.ajax({
+      url: '/load',
+      success: (data) => {
+        console.log('component did mount data: \n', data)
+        this.setState({
+          fighters: data
+        })
+      },
+      error: (err) => {
+        console.log('error in loading data: \n', err)
+      }
+    })
   }
 
   onChange(val) {
@@ -41,10 +44,8 @@ class App extends React.Component {
       url: '/search',
       data: {fighter: this.state.fighter},
       success: (data) => {
-        console.log(data)
-        this.setState({
-          test: data
-        })
+        console.log('successfully submitted fighter', this.state)
+        this.componentDidMount();
       },
       error: (err) => {
         console.log('error in search get request: \n', err)
@@ -54,6 +55,20 @@ class App extends React.Component {
 
   onClick() {
     console.log(this.state);
+    this.setState({
+      test: this.state.test + 1
+    })
+  }
+
+  removeHandler(name) {
+    $.ajax({
+      url: '/search',
+      method: 'DELETE',
+      data: {fighter: name},
+      success: ()=> {
+        this.componentDidMount();
+      }
+    })
   }
 
   render() {
@@ -63,15 +78,17 @@ class App extends React.Component {
           event.preventDefault();
           this.onSubmit();
         }}>
-        <input type='text' placeholder='fighter name...' onChange={(event) => {
+        <input type='text' placeholder='insert fighter url...' onChange={(event) => {
           //</form>console.log(event.target)
           this.onChange(event.target.value);
         }}></input>
         <input type='submit' value='search'></input>
       </form>
-      <button onClick={
+      <button onClick={() => {
         this.onClick()
+      }
       }>show state</button>
+      <List items={this.state.fighters} removeHandler={this.removeHandler}></List>
     </div>
     )
   }
