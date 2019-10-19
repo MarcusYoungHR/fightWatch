@@ -12,7 +12,7 @@ const ListItem = (props) => {
       <div>{props.item.name} <button id={props.item.name} onClick={function() {
         props.removeHandler(event.target.id)
       }}>remove</button></div>
-      <img src={'https://www.sherdog.com' + props.item.image}></img>
+      <img src={props.item.image}></img>
       <span>{"Fighting vs " + props.item.next_opponent + ' on ' + props.item.next_fight}</span>
     </div>
   )
