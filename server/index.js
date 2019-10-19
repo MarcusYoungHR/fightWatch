@@ -50,9 +50,22 @@ app.get('/search', function (req, res) {
 });
 
 app.get('/load', function(req, res) {
-
   getFighters().then(function(data) {
     res.send(data);
+  })
+})
+
+app.get('/boxer', function(req, res) {
+  var string = transposeName(req.query.fighter);
+  request(`https://www.googleapis.com/customsearch/v1?key=AIzaSyAgLmwFLMuqANxoLxNVrILaslMuNUy9DF8&cx=007218699401475344710:yfnajvqu4fm&q=${string}`, function(err, response, body) {
+    var url = JSON.parse(body).items[0].link;
+
+    sherdog.getBoxer(url, function(guy) {
+      insertFighter(guy).then((data) => {
+        console.log(guy)
+        res.send(guy)
+      });
+    }, req.query.fighter)
   })
 })
 
@@ -63,7 +76,6 @@ app.delete('/search', function(req, res) {
 })
 
 app.get('/test', function(req, res) {
-  request('https://www.googleapis.com/customsearch/v1?key=AIzaSyAgLmwFLMuqANxoLxNVrILaslMuNUy9DF8&cx=007218699401475344710:xatgqbhqag0&q=sherdog+stipe+miocic', function(err, res, body) {
-    console.log('body********************************************************************************* \n', JSON.parse(body).items);
-  })
+  sherdog.getBoxer();
+  res.end()
 })

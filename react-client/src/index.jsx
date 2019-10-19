@@ -16,13 +16,14 @@ class App extends React.Component {
     this.onSubmit = this.onSubmit.bind(this);
     this.onClick = this.onClick.bind(this);
     this.removeHandler = this.removeHandler.bind(this);
+    this.onBoxerSubmit = this.onBoxerSubmit.bind(this);
   }
 
   componentDidMount() {
     $.ajax({
       url: '/load',
       success: (data) => {
-        console.log('component did mount data: \n', data)
+        //console.log('component did mount data: \n', data)
         this.setState({
           fighters: data
         })
@@ -40,11 +41,27 @@ class App extends React.Component {
   }
 
   onSubmit() {
+    console.log('searching for ufc')
     $.ajax({
       url: '/search',
-      data: {fighter: this.state.fighter},
+      data: { fighter: this.state.fighter },
       success: (data) => {
         console.log('successfully submitted fighter', this.state)
+        this.componentDidMount();
+      },
+      error: (err) => {
+        console.log('error in search get request: \n', err)
+      }
+    })
+  }
+
+  onBoxerSubmit() {
+    console.log('searching for boxer');
+    $.ajax({
+      url: '/boxer',
+      data: { fighter: this.state.fighter },
+      success: (data) => {
+        console.log('successfully submitted boxer', data)
         this.componentDidMount();
       },
       error: (err) => {
@@ -63,8 +80,8 @@ class App extends React.Component {
     $.ajax({
       url: '/search',
       method: 'DELETE',
-      data: {fighter: name},
-      success: ()=> {
+      data: { fighter: name },
+      success: () => {
         this.componentDidMount();
       }
     })
@@ -72,23 +89,26 @@ class App extends React.Component {
 
   render() {
     return (
-    <div>
-      <form  onSubmit={(event) => {
-          event.preventDefault();
-          this.onSubmit();
-        }}>
-        <input type='text' placeholder='insert fighter url...' onChange={(event) => {
-          //</form>console.log(event.target)
-          this.onChange(event.target.value);
-        }}></input>
-        <input type='submit' value='search'></input>
-      </form>
-      <button onClick={() => {
-        this.onClick()
-      }
-      }>show state</button>
-      <List items={this.state.fighters} removeHandler={this.removeHandler}></List>
-    </div>
+      <div>
+        <form>
+          <input type='text' placeholder='insert fighter url...' onChange={(event) => {
+            //</form>console.log(event.target)
+            this.onChange(event.target.value);
+          }}></input>
+
+          <button onClick={(event) => {
+            event.preventDefault();
+            this.onBoxerSubmit()
+          }
+          }>Boxing</button>
+          <button onClick={(event)=> {
+            event.preventDefault();
+            this.onSubmit()
+          }}>UFC</button>
+        </form>
+
+        <List items={this.state.fighters} removeHandler={this.removeHandler}></List>
+      </div>
     )
   }
 }
