@@ -3,7 +3,8 @@ const Sequelize = require('sequelize');
 const sequelize = new Sequelize('fighterDB', 'root', 'password', {
   host: 'localhost',
   dialect: 'mysql',
-  logging: false
+  logging: false,
+  port: 3306
 });
 
 sequelize.authenticate().then(() => {
@@ -37,6 +38,7 @@ var model = {
 const Fighters = sequelize.define('fighters', model)
 
 //Fighters.sync()
+//creates the table if it doesn't exist
 
 const insertFighter = function(obj) {
   return Fighters.upsert(obj).then(function(data) {

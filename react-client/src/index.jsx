@@ -23,7 +23,7 @@ class App extends React.Component {
     $.ajax({
       url: '/load',
       success: (data) => {
-        //console.log('component did mount data: \n', data)
+        console.log('component did mount data: \n', data)
         this.setState({
           fighters: data
         })
