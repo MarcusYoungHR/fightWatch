@@ -72,7 +72,7 @@ class App extends React.Component {
 
   onClick() {
     $.ajax({
-      url: '/test'
+      url: '/refresh'
     })
   }
 
@@ -90,6 +90,7 @@ class App extends React.Component {
   render() {
     return (
       <div>
+        <h1>Fight Watch!</h1>
         <form>
           <input type='text' placeholder='insert fighter url...' onChange={(event) => {
             //</form>console.log(event.target)
@@ -106,7 +107,10 @@ class App extends React.Component {
             this.onSubmit()
           }}>UFC</button>
         </form>
-
+          <button onClick={(event) => {
+            event.preventDefault();
+            this.onClick()
+          }}>TEST</button>
         <List items={this.state.fighters} removeHandler={this.removeHandler}></List>
       </div>
     )

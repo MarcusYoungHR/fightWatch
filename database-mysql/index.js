@@ -32,17 +32,20 @@ var model = {
   },
   image: {
     type: Sequelize.STRING
+  },
+  style: {
+    type: Sequelize.STRING
   }
 }
 
 const Fighters = sequelize.define('fighters', model)
 
-//Fighters.sync()
+Fighters.sync()
 //creates the table if it doesn't exist
 
 const insertFighter = function(obj) {
   return Fighters.upsert(obj).then(function(data) {
-    console.log('inserted a fighter')
+    console.log('inserted a fighter \n', data)
   }).catch(function(err) {
     console.log('failed to insert: \n', err);
   })
@@ -54,6 +57,15 @@ const getFighters = function() {
     return data;
   }).catch(function(err) {
     console.log('failed to retrieve list: \n', err);
+  })
+}
+
+const getNameList = function() {
+  return Fighters.findAll({attributes: ['name', 'style'], raw: true}).then(function(data) {
+    console.log('retreived fighter names \n', data)
+    return data
+  }).catch(function(err) {
+    console.log('failed to retrieve fighter names \n', err)
   })
 }
 
@@ -72,5 +84,6 @@ const removeFighter = function(name) {
 module.exports = {
   insertFighter,
   getFighters,
-  removeFighter
+  removeFighter,
+  getNameList
 }
