@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack -d --watch",
-    "server": "nodemon server/index.js"
+    "start": "nodemon server/index.js"
   },
   "author": "Beth Johnson",
   "license": "ISC",
@@ -18,8 +18,11 @@
     "body-parser": "^1.19.0",
     "bootstrap": "^4.3.1",
     "boxrec": "^7.1.1",
+    "connect-session-sequelize": "^6.1.1",
+    "cookie-parser": "^1.4.4",
     "css-loader": "^3.2.0",
     "express": "^4.17.1",
+    "express-session": "^1.17.0",
     "faker": "^4.1.0",
     "jquery": "^3.4.1",
     "jsdom": "^15.1.1",

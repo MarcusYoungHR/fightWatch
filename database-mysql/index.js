@@ -38,8 +38,25 @@ var model = {
   }
 }
 
-const Fighters = sequelize.define('fighters', model)
+var users = {
+  id: {
+    type: Sequelize.INTEGER,
+    autoIncrement: true,
+    primaryKey: true
+  },
+  username: {
+    type: Sequelize.STRING,
+    unique: true
+  },
+  password: {
+    type: Sequelize.STRING
+  }
+}
 
+const Fighters = sequelize.define('fighters', model)
+const Users = sequelize.define('users', users);
+
+Users.sync()
 Fighters.sync()
 //creates the table if it doesn't exist
 
@@ -81,9 +98,18 @@ const removeFighter = function(name) {
   })
 }
 
+const insertUser = function(user) {
+  return Users.create(user).then(() => {
+    console.log('inserted user')
+  }).catch((err) => {
+    console.log('error inserting user \n', err);
+  })
+}
+
 module.exports = {
   insertFighter,
   getFighters,
   removeFighter,
-  getNameList
+  getNameList,
+  insertUser
 }

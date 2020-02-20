@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
 import List from './components/List.jsx';
+import Signup from './components/Signup.jsx'
 import '../dist/styles.css'
 
 class App extends React.Component {
@@ -10,7 +11,8 @@ class App extends React.Component {
     this.state = {
       fighters: [],
       fighter: '',
-      test: 0
+      test: 0,
+      view: 'signup'
     }
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
@@ -88,32 +90,42 @@ class App extends React.Component {
   }
 
   render() {
-    return (
-      <div>
-        <h1>Fight Watch!</h1>
-        <form>
-          <input type='text' placeholder='insert fighter url...' onChange={(event) => {
-            //</form>console.log(event.target)
-            this.onChange(event.target.value);
-          }}></input>
+    if (this.state.view === 'signup') {
+      return (
+        <Signup />
+      )
+    } else {
 
-          <button onClick={(event) => {
-            event.preventDefault();
-            this.onBoxerSubmit()
-          }
-          }>Boxing</button>
-          <button onClick={(event)=> {
-            event.preventDefault();
-            this.onSubmit()
-          }}>UFC</button>
-        </form>
+      return (
+        <div>
+          <h1>Fight Watch!</h1>
+          <button>
+
+          </button>
+          <form>
+            <input type='text' placeholder='insert fighter url...' onChange={(event) => {
+              //</form>console.log(event.target)
+              this.onChange(event.target.value);
+            }}></input>
+
+            <button onClick={(event) => {
+              event.preventDefault();
+              this.onBoxerSubmit()
+            }
+            }>Boxing</button>
+            <button onClick={(event) => {
+              event.preventDefault();
+              this.onSubmit()
+            }}>UFC</button>
+          </form>
           <button onClick={(event) => {
             event.preventDefault();
             this.onClick()
           }}>TEST</button>
-        <List items={this.state.fighters} removeHandler={this.removeHandler}></List>
-      </div>
-    )
+          <List items={this.state.fighters} removeHandler={this.removeHandler}></List>
+        </div>
+      )
+    }
   }
 }
 

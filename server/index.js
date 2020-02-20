@@ -1,9 +1,15 @@
 var express = require('express');
 var bodyParser = require('body-parser');
+var Sequelize = require('sequelize')
 const request = require('request');
 var sherdog = require('sherdog');
-const boxrec = require("boxrec").Boxrec;
-const {insertFighter, getFighters, removeFighter, getNameList} = require('../database-mysql/index.js')
+var cookieParser = require('cookie-parser');
+var expressSession = require('express-session');
+const {insertFighter, getFighters, removeFighter, getNameList, insertUser} = require('../database-mysql/index.js')
+
+var SequelizeStore = require('connect-session-sequelize')(session.Store);
+
+
 
 var app = express();
 app.use(bodyParser());
@@ -13,6 +19,15 @@ app.use(express.static(__dirname + '/../react-client/dist'));
 app.listen(3000, function () {
   console.log('listening on port 3000!');
 });
+
+//app.use(cookieParser())
+app.use(expressSession({
+  secret: 'rent free',
+  cookie: {
+    maxAge: 86400000,
+    secure: false
+  }
+}))
 
 var transposeName = function(name) {
   var butt = name.replace(/ /g, '+');
@@ -30,6 +45,12 @@ app.get('/search', function (req, res) {
     })
   })
 });
+
+app.post('/signup', function(req, res) {
+  insertUser(req.body.user).then(() => {
+    res.end()
+  })
+})
 
 app.get('/load', function(req, res) {
   getFighters().then(function(data) {
@@ -55,17 +76,6 @@ app.delete('/search', function(req, res) {
     res.end();
   })
 })
-
-app.get('/test', function(req, res) {
-  sherdog.getBoxer();
-  res.end()
-})
-
-app.get('/refresh', function(req, res) {
-  getNameList()
-})
-
-//console.log(Date.now() / 86400000)
 
 let dayInMS = 86400000
 

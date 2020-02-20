@@ -2,10 +2,10 @@ import React from 'react';
 
 const ListItem = (props) => {
   if (props.item.next_fight.length === 0) {
-    props.item.next_fight = 'TBD';
+    props.item.next_fight = 'TBA';
   }
   if (props.item.next_opponent.length === 0) {
-    props.item.next_opponent = 'TBD';
+    props.item.next_opponent = 'TBA';
   }
   return (
     <div>
