@@ -7,9 +7,11 @@ var cookieParser = require('cookie-parser');
 var expressSession = require('express-session');
 const {insertFighter, getFighters, removeFighter, getNameList, insertUser} = require('../database-mysql/index.js')
 
-var SequelizeStore = require('connect-session-sequelize')(session.Store);
+var SequelizeStore = require('connect-session-sequelize')(expressSession.Store);
 
-
+var sequelize = new Sequelize( "fighterDB", "root", "password", {
+  dialect: "mysql"
+});
 
 var app = express();
 app.use(bodyParser());
@@ -20,14 +22,23 @@ app.listen(3000, function () {
   console.log('listening on port 3000!');
 });
 
-//app.use(cookieParser())
+var myStore = new SequelizeStore({
+  db: sequelize
+})
+
 app.use(expressSession({
   secret: 'rent free',
+  store: myStore,
+  saveUninitialized: false,
+  resave: false,
   cookie: {
-    maxAge: 86400000,
+    maxAge: 1000 * 60 * 60 * 24,
     secure: false
-  }
+  },
+  name: 'fightWatchId'
 }))
+
+myStore.sync();
 
 var transposeName = function(name) {
   var butt = name.replace(/ /g, '+');
@@ -47,9 +58,17 @@ app.get('/search', function (req, res) {
 });
 
 app.post('/signup', function(req, res) {
-  insertUser(req.body.user).then(() => {
-    res.end()
-  })
+  console.log('sessionId \n', req.session)
+  // insertUser(req.body.user).then(() => {
+  //   console.log('request cookie \n', req.cookie)
+  //   res.end()
+  // })
+  res.end()
+})
+
+app.post('/sessionTest', function(req, res) {
+  req.session.userId = 'buttplug'
+  res.end()
 })
 
 app.get('/load', function(req, res) {
@@ -76,8 +95,8 @@ app.delete('/search', function(req, res) {
     res.end();
   })
 })
-
-let dayInMS = 86400000
+//            ms     s    m    h
+let dayInMS = 1000 * 60 * 60 * 24
 
 const refreshList = function() {
   getNameList().then((data) => {

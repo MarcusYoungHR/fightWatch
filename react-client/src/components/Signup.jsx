@@ -16,7 +16,7 @@ class Signup extends React.Component {
   changeHandler(entry, val) {
     this.setState({
       [entry]: val
-    }, () => {console.log(this.state)})
+    })
   }
 
   submitHandler() {
@@ -48,9 +48,11 @@ class Signup extends React.Component {
           <button onClick={(event) => {
             event.preventDefault()
             this.submitHandler();
-          }}>
-            Sign Up
-          </button>
+          }}> Login </button>
+          <button onClick={(event) => {
+            event.preventDefault()
+            this.submitHandler();
+          }}> Register </button>
         </form>
       </div>
     )
