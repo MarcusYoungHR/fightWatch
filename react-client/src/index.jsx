@@ -4,6 +4,7 @@ import $ from 'jquery';
 import List from './components/List.jsx';
 import Signup from './components/Signup.jsx'
 import '../dist/styles.css'
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 class App extends React.Component {
   constructor(props) {

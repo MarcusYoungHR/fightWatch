@@ -5,40 +5,39 @@ const request = require('request');
 var sherdog = require('sherdog');
 var cookieParser = require('cookie-parser');
 var expressSession = require('express-session');
-const {insertFighter, getFighters, removeFighter, getNameList, insertUser} = require('../database-mysql/index.js')
+//const {insertFighter, getFighters, removeFighter, getNameList, insertUser} = require('../database-mysql/index.js')
 
-var SequelizeStore = require('connect-session-sequelize')(expressSession.Store);
+//var SequelizeStore = require('connect-session-sequelize')(expressSession.Store);
 
-var sequelize = new Sequelize( "fighterDB", "root", "password", {
-  dialect: "mysql"
-});
+// var sequelize = new Sequelize( "fighterDB", "root", "password", {
+//   dialect: "mysql"
+// });
 
 var app = express();
 app.use(bodyParser());
-// UNCOMMENT FOR REACT
 app.use(express.static(__dirname + '/../react-client/dist'));
 
 app.listen(3000, function () {
   console.log('listening on port 3000!');
 });
 
-var myStore = new SequelizeStore({
-  db: sequelize
-})
+// var myStore = new SequelizeStore({
+//   db: sequelize
+// })
 
-app.use(expressSession({
-  secret: 'rent free',
-  store: myStore,
-  saveUninitialized: false,
-  resave: false,
-  cookie: {
-    maxAge: 1000 * 60 * 60 * 24,
-    secure: false
-  },
-  name: 'fightWatchId'
-}))
+// app.use(expressSession({
+//   secret: 'rent free',
+//   store: myStore,
+//   saveUninitialized: false,
+//   resave: false,
+//   cookie: {
+//     maxAge: 1000 * 60 * 60 * 24,
+//     secure: false
+//   },
+//   name: 'fightWatchId'
+// }))
 
-myStore.sync();
+// myStore.sync();
 
 var transposeName = function(name) {
   var butt = name.replace(/ /g, '+');

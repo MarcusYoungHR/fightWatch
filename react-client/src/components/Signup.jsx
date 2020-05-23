@@ -2,12 +2,15 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
 
+
+
 class Signup extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       username: '',
-      password: ''
+      password: '',
+      method: '/signup'
     }
     this.changeHandler = this.changeHandler.bind(this)
     this.submitHandler = this.submitHandler.bind(this)
@@ -19,23 +22,29 @@ class Signup extends React.Component {
     })
   }
 
-  submitHandler() {
-    $.ajax({
-      url: '/signup',
-      type: 'POST',
-      data: {user: this.state},
-      success: () => {
-        console.log('yay')
-      },
-      error: (err) => {
-        console.log('error in signup \n', err)
-      }
+  submitHandler(method) {
+    this.setState({
+      method: method
+    }, () => {
+      console.log(this.state.method)
+      // $.ajax({
+      //   url: this.state.method,
+      //   type: 'POST',
+      //   data: {user: this.state},
+      //   success: () => {
+      //     console.log('yay')
+      //   },
+      //   error: (err) => {
+      //     console.log('error in signup \n', err)
+      //   }
+      // })
     })
   }
 
   render() {
+
     return (
-      <div>
+      <div class = 'mx-auto' style={{width: '200px', backgroundColor: 'white'}}>
         <form>
           <input type='text' placeholder='user name' onChange={(event) => {
             this.changeHandler('username', event.target.value)
@@ -45,13 +54,13 @@ class Signup extends React.Component {
             this.changeHandler('password', event.target.value)
           }}>
           </input>
-          <button onClick={(event) => {
+          <button className="btn btn-outline-secondary" onClick={(event) => {
             event.preventDefault()
-            this.submitHandler();
+            this.submitHandler('/signup');
           }}> Login </button>
-          <button onClick={(event) => {
+          <button className="btn btn-outline-secondary" style = {{marginLeft: '30px'}} onClick={(event) => {
             event.preventDefault()
-            this.submitHandler();
+            this.submitHandler('/register');
           }}> Register </button>
         </form>
       </div>
