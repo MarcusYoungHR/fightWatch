@@ -93,7 +93,9 @@ class App extends React.Component {
   render() {
     if (this.state.view === 'signup') {
       return (
-        <Signup />
+        <div>
+          <Signup />
+        </div>
       )
     } else {
 

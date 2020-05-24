@@ -14,6 +14,15 @@ class Signup extends React.Component {
     }
     this.changeHandler = this.changeHandler.bind(this)
     this.submitHandler = this.submitHandler.bind(this)
+
+    this.eyeShape = {
+      margin: '0 auto',
+      width: '160px',
+      height: '160px',
+      backgroundImage: "url(images/Untitled.png)",
+      borderRadius: '100% 0px',
+      transform: 'rotate(45deg)'
+    }
   }
 
   changeHandler(entry, val) {
@@ -41,28 +50,35 @@ class Signup extends React.Component {
     })
   }
 
+
+
   render() {
 
     return (
-      <div class = 'mx-auto' style={{width: '200px', backgroundColor: 'white'}}>
-        <form>
-          <input type='text' placeholder='user name' onChange={(event) => {
-            this.changeHandler('username', event.target.value)
-          }}>
-          </input>
-          <input type='text' placeholder='password' onChange={(event) => {
-            this.changeHandler('password', event.target.value)
-          }}>
-          </input>
-          <button className="btn btn-outline-secondary" onClick={(event) => {
-            event.preventDefault()
-            this.submitHandler('/signup');
-          }}> Login </button>
-          <button className="btn btn-outline-secondary" style = {{marginLeft: '30px'}} onClick={(event) => {
-            event.preventDefault()
-            this.submitHandler('/register');
-          }}> Register </button>
-        </form>
+      <div>
+        <div style ={this.eyeShape}></div>
+
+        <h1 style = {{display: 'block', margin: 'auto', width: '300px', backgroundColor: 'white', borderStyle: 'solid', borderWidth: '7px 7px 0px 7px', marginTop: '21%', textAlign: 'center', paddingBottom: '20px'}}>Login</h1>
+        <div class='mx-auto' style={{ width: '300px', backgroundColor: 'white', borderStyle: 'solid', borderWidth: '0px 7px 7px 7px', marginTop: '-7px', position: 'relative'}}>
+          <form>
+            <input type='text' placeholder='user name' style={{ width: '286px', position: 'relative' }} onChange={(event) => {
+              this.changeHandler('username', event.target.value)
+            }}>
+            </input>
+            <input type='text' placeholder='password' style={{ width: '286px', position: 'relative' }} onChange={(event) => {
+              this.changeHandler('password', event.target.value)
+            }}>
+            </input>
+            <button className="btn btn-outline-secondary" style={{borderRadius: '0px', position: 'relative'}} onClick={(event) => {
+              event.preventDefault()
+              this.submitHandler('/signup');
+            }}> Login </button>
+            <button className="btn btn-outline-secondary" style={{borderRadius: '0px', float: 'right' }} onClick={(event) => {
+              event.preventDefault()
+              this.submitHandler('/register');
+            }}> Register </button>
+          </form>
+        </div>
       </div>
     )
   }
