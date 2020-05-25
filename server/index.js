@@ -5,13 +5,13 @@ const request = require('request');
 var sherdog = require('sherdog');
 var cookieParser = require('cookie-parser');
 var expressSession = require('express-session');
-//const {insertFighter, getFighters, removeFighter, getNameList, insertUser} = require('../database-mysql/index.js')
+const {insertFighter, getFighters, removeFighter, getNameList, insertUser} = require('../database-mysql/index.js')
 
-//var SequelizeStore = require('connect-session-sequelize')(expressSession.Store);
+var SequelizeStore = require('connect-session-sequelize')(expressSession.Store);
 
-// var sequelize = new Sequelize( "fighterDB", "root", "password", {
-//   dialect: "mysql"
-// });
+var sequelize = new Sequelize( "fighterDB", "root", "password", {
+  dialect: "mysql"
+});
 
 var app = express();
 app.use(bodyParser());
@@ -21,27 +21,32 @@ app.listen(3000, function () {
   console.log('listening on port 3000!');
 });
 
-// var myStore = new SequelizeStore({
-//   db: sequelize
-// })
+var myStore = new SequelizeStore({
+  db: sequelize
+})
 
-// app.use(expressSession({
-//   secret: 'rent free',
-//   store: myStore,
-//   saveUninitialized: false,
-//   resave: false,
-//   cookie: {
-//     maxAge: 1000 * 60 * 60 * 24,
-//     secure: false
-//   },
-//   name: 'fightWatchId'
-// }))
+myStore.sync();
 
-// myStore.sync();
+app.use(expressSession({
+  secret: 'rent free',
+  store: myStore,
+  saveUninitialized: false,
+  resave: false,
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24,
+    secure: false
+  },
+  name: 'fightWatchId'
+}))
+
 
 var transposeName = function(name) {
-  var butt = name.replace(/ /g, '+');
-  return butt;
+  var transposed = name.replace(/ /g, '+');
+  return transposed;
+}
+
+const redirectLogin = function(req, res, next) {
+  
 }
 
 app.get('/search', function (req, res) {
@@ -58,10 +63,10 @@ app.get('/search', function (req, res) {
 
 app.post('/signup', function(req, res) {
   console.log('sessionId \n', req.session)
-  // insertUser(req.body.user).then(() => {
-  //   console.log('request cookie \n', req.cookie)
-  //   res.end()
-  // })
+  insertUser(req.body.user).then(() => {
+    console.log('request cookie \n', req.cookie)
+    res.end()
+  })
   res.end()
 })
 
