@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
 import List from './components/List.jsx';
-import Signup from './components/Signup.jsx'
+//import Signup from './components/Signup.jsx'
 import '../dist/styles.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -13,7 +13,7 @@ class App extends React.Component {
       fighters: [],
       fighter: '',
       test: 0,
-      view: 'signup'
+      view: ''
     }
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);

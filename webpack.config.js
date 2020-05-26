@@ -4,8 +4,12 @@ var DIST_DIR = path.join(__dirname, '/react-client/dist');
 
 
 module.exports = {
-  entry: path.join(__dirname, '/react-client/src/index.jsx'),
+  entry: {
+    app: path.join(__dirname, '/react-client/src/index.jsx'),
+    signup: path.join(__dirname, '/react-client/src/Signup.jsx'),
+  },
   module: {
+
     rules: [
       {
         test: [/\.jsx$/],
@@ -24,10 +28,21 @@ module.exports = {
     ]
   },
    output: {
-    filename: 'bundle.js',
+    filename: '[name].js',
     path: __dirname + '/react-client/dist'
   }
 
 };
+
+/**
+ *   entry: {
+    app: './src/app.js',
+    search: './src/search.js'
+  },
+  output: {
+    filename: '[name].js',
+    path: __dirname + '/dist'
+  }
+ */
 
 //console.log(__dirname);
