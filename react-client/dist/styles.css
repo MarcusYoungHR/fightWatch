@@ -2,3 +2,46 @@
   height: auto;
   width: 100px;
 } */
+
+.signUpHeader {
+  display: block;
+  margin: auto;
+  width: 300px;
+  background-color: white;
+  border-style: solid;
+  border-width: 7px 7px 0px 7px;
+  margin-top: 21%;
+  text-align: center;
+  padding-bottom: 20px;
+}
+
+.loginForm {
+  width: 300px;
+  background-color: white;
+  border-style: solid;
+  border-width: 0px 7px 7px 7px;
+  margin-top: -7px;
+  position: relative;
+}
+
+.loginInput {
+  width: 286px;
+  position: relative;
+}
+
+.eyeShape {
+  margin: 0 auto;
+  width: 160px;
+  height: 160px;
+  background-image: url('images/Untitled.png');
+  border-radius: 100% 0px;
+  transform: rotate(45deg);
+}
+
+.loginBtn {
+  position: relative;
+}
+
+.registerBtn {
+  float: right;
+}

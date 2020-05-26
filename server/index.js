@@ -70,8 +70,8 @@ app.get('/search', function (req, res) { //search sherdog for mma fighter
 });
 
 app.get('/multiple', (req, res) => {
-  
-  res.sendFile((path.resolve('react-client/dist/please.html')))
+
+  res.sendFile((path.resolve('react-client/dist/home.html')))
 })
 
 
