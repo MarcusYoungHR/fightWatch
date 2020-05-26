@@ -9,8 +9,11 @@ const {insertFighter, getFighters, removeFighter, getNameList, insertUser} = req
 
 var SequelizeStore = require('connect-session-sequelize')(expressSession.Store);
 
-var sequelize = new Sequelize( "fighterDB", "root", "password", {
-  dialect: "mysql"
+const serverSequelize = new Sequelize('fighterDB', 'Marcus', '4815162342Aa!', {
+  host: 'ec2-18-191-68-100.us-east-2.compute.amazonaws.com',
+  dialect: 'mysql',
+  logging: false,
+  port: 3306
 });
 
 var app = express();
@@ -22,7 +25,7 @@ app.listen(3000, function () {
 });
 
 var myStore = new SequelizeStore({
-  db: sequelize
+  db: serverSequelize
 })
 
 myStore.sync();
@@ -45,11 +48,15 @@ var transposeName = function(name) {
   return transposed;
 }
 
-const redirectLogin = function(req, res, next) {
-  
-}
+const redirectLogin = (req, res, next) => { //custom middleware i define
+    if (!req.session.userId) { //true if session object is uninitialized, ie we didnt put any data on the sessions object. checking to see if the user is logged in or not
+      res.redirect('/login') //redirects to the login page if the user is not logged in
+    } else { //if the user is logged in
+      next() //move onto next middleware
+    }
+  }
 
-app.get('/search', function (req, res) {
+app.get('/search', function (req, res) { //search sherdog for mma fighter
   var string = transposeName(req.query.fighter);
   request(`https://www.googleapis.com/customsearch/v1?key=AIzaSyAgLmwFLMuqANxoLxNVrILaslMuNUy9DF8&cx=007218699401475344710:xatgqbhqag0&q=${string}`, function(err, response, body) {
     var url = JSON.parse(body).items[0].link;
@@ -81,7 +88,7 @@ app.get('/load', function(req, res) {
   })
 })
 
-app.get('/boxer', function(req, res) {
+app.get('/boxer', function(req, res) { //search boxrec for boxer
   var string = transposeName(req.query.fighter);
   request(`https://www.googleapis.com/customsearch/v1?key=AIzaSyAgLmwFLMuqANxoLxNVrILaslMuNUy9DF8&cx=007218699401475344710:d2e5d7wqupx&q=${string}`, function(err, response, body) {
     var url = JSON.parse(body).items[0].link
