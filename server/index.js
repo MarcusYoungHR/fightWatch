@@ -6,6 +6,7 @@ var sherdog = require('sherdog');
 var cookieParser = require('cookie-parser');
 var expressSession = require('express-session');
 const {insertFighter, getFighters, removeFighter, getNameList, insertUser} = require('../database-mysql/index.js')
+const path = require('path')
 
 var SequelizeStore = require('connect-session-sequelize')(expressSession.Store);
 
@@ -67,6 +68,12 @@ app.get('/search', function (req, res) { //search sherdog for mma fighter
     })
   })
 });
+
+app.get('/multiple', (req, res) => {
+  
+  res.sendFile((path.resolve('react-client/dist/please.html')))
+})
+
 
 app.post('/signup', function(req, res) {
   console.log('sessionId \n', req.session)

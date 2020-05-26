@@ -36,17 +36,17 @@ class Signup extends React.Component {
       method: method
     }, () => {
       console.log(this.state.method)
-      // $.ajax({
-      //   url: this.state.method,
-      //   type: 'POST',
-      //   data: {user: this.state},
-      //   success: () => {
-      //     console.log('yay')
-      //   },
-      //   error: (err) => {
-      //     console.log('error in signup \n', err)
-      //   }
-      // })
+      $.ajax({
+        url: this.state.method,
+        type: 'get',
+        //data: {user: this.state},
+        success: () => {
+          console.log('yay')
+        },
+        error: (err) => {
+          console.log('error in signup \n', err)
+        }
+      })
     })
   }
 
@@ -60,7 +60,7 @@ class Signup extends React.Component {
 
         <h1 style = {{display: 'block', margin: 'auto', width: '300px', backgroundColor: 'white', borderStyle: 'solid', borderWidth: '7px 7px 0px 7px', marginTop: '21%', textAlign: 'center', paddingBottom: '20px'}}>Login</h1>
         <div class='mx-auto' style={{ width: '300px', backgroundColor: 'white', borderStyle: 'solid', borderWidth: '0px 7px 7px 7px', marginTop: '-7px', position: 'relative'}}>
-          <form>
+          <form action = '/multiple'>
             <input type='text' placeholder='user name' style={{ width: '286px', position: 'relative' }} onChange={(event) => {
               this.changeHandler('username', event.target.value)
             }}>
@@ -70,8 +70,8 @@ class Signup extends React.Component {
             }}>
             </input>
             <button className="btn btn-outline-secondary" style={{borderRadius: '0px', position: 'relative'}} onClick={(event) => {
-              event.preventDefault()
-              this.submitHandler('/signup');
+              //event.preventDefault()
+              //this.submitHandler('/multiple');
             }}> Login </button>
             <button className="btn btn-outline-secondary" style={{borderRadius: '0px', float: 'right' }} onClick={(event) => {
               event.preventDefault()
