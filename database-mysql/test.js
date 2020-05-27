@@ -6,7 +6,7 @@ const sequelize = new Sequelize('fighterDB', 'Marcus', '4815162342Aa!', {
   logging: false,
   port: 3306
 });
-
+//f
 sequelize.authenticate().then(() => {
   console.log('connected to mysql');
 }).catch((err) => {
