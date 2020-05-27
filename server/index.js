@@ -44,7 +44,7 @@ app.use(expressSession({
 }))
 
 
-var transposeName = function(name) {
+var transposeName = function(name) { //helper function to tranpose names so they are google searchable
   var transposed = name.replace(/ /g, '+');
   return transposed;
 }
@@ -56,6 +56,14 @@ const redirectLogin = (req, res, next) => { //custom middleware i define
       next() //move onto next middleware
     }
   }
+
+  const redirectHome = (req, res, next) => {
+      if (req.session.userId) { //checks to see if user is authenticated
+        res.redirect('/home') //if they are authenticated, redirect to home
+      } else {
+        next() //if they are not authenticated move onto next middleware
+      }
+    }
 
 app.get('/search', function (req, res) { //search sherdog for mma fighter
   var string = transposeName(req.query.fighter);
@@ -69,11 +77,14 @@ app.get('/search', function (req, res) { //search sherdog for mma fighter
   })
 });
 
-app.get('/multiple', (req, res) => {
-
+app.post('/login', (req, res) => {
+  console.log(req)
   res.sendFile((path.resolve('react-client/dist/home.html')))
 })
 
+app.post('/register', (req, res) => {
+  //data is in request body
+})
 
 app.post('/signup', function(req, res) {
   console.log('sessionId \n', req.session)
@@ -108,7 +119,7 @@ app.get('/boxer', function(req, res) { //search boxrec for boxer
   })
 })
 
-app.delete('/search', function(req, res) {
+app.delete('/search', function(req, res) { //delete fighter from database
   removeFighter(req.body.fighter).then(()=> {
     res.end();
   })
@@ -116,7 +127,7 @@ app.delete('/search', function(req, res) {
 //            ms     s    m    h
 let dayInMS = 1000 * 60 * 60 * 24
 
-const refreshList = function() {
+const refreshList = function() { //refresh all fighters
   getNameList().then((data) => {
     for (let i = 0; i < data.length; i ++) {
       if (data[i].style === 'boxing') {
@@ -129,7 +140,7 @@ const refreshList = function() {
   })
 }
 
-const refreshBoxer = function(boxer) {
+const refreshBoxer = function(boxer) { //helper function to refresh boxers
   var string = transposeName(boxer);
   request(`https://www.googleapis.com/customsearch/v1?key=AIzaSyAgLmwFLMuqANxoLxNVrILaslMuNUy9DF8&cx=007218699401475344710:d2e5d7wqupx&q=${string}`, function(err, response, body) {
     var url = JSON.parse(body).items[0].link
@@ -139,7 +150,7 @@ const refreshBoxer = function(boxer) {
   })
 }
 
-const refreshFighter = function (fighter) {
+const refreshFighter = function (fighter) { //helper function to refresh mma fighters
   var string = transposeName(fighter);
   request(`https://www.googleapis.com/customsearch/v1?key=AIzaSyAgLmwFLMuqANxoLxNVrILaslMuNUy9DF8&cx=007218699401475344710:xatgqbhqag0&q=${string}`, function(err, response, body) {
     var url = JSON.parse(body).items[0].link;
