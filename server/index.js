@@ -5,7 +5,7 @@ const request = require('request');
 var sherdog = require('sherdog');
 var cookieParser = require('cookie-parser');
 var expressSession = require('express-session');
-const {insertFighter, getFighters, removeFighter, getNameList, insertUser} = require('../database-mysql/index.js')
+const {insertFighter, getFighters, removeFighter, getNameList, insertUser, getUser} = require('../database-mysql/index.js')
 const path = require('path')
 
 var SequelizeStore = require('connect-session-sequelize')(expressSession.Store);
@@ -78,12 +78,28 @@ app.get('/search', function (req, res) { //search sherdog for mma fighter
 });
 
 app.post('/login', (req, res) => {
-  console.log(req)
-  res.sendFile((path.resolve('react-client/dist/home.html')))
+  req.session.userId = 'hello'
+
 })
 
 app.post('/register', (req, res) => {
-  //data is in request body
+  //what am i trying to do
+  // var userData = {username: req.body.username, password: req.body.password}
+  // getUser(req.body.username).then((user) => { //when a user registers we look him up in the users table
+  //   if (user === null) {//if there is no matching user
+  //     insertUser(userData)//insert the user into the users table
+  //     req.session.userId = userData.username//set user.id on the request object
+  //     myStore.set()//insert the session into the session table
+  //     //redirect to /home
+  //   }//if there is a matching user
+  //     //redirect to /register
+  // })
+  req.session.userId = 'hello'
+  res.end()
+})
+
+app.get('/home', redirectLogin, (req, res) => {
+  res.sendFile((path.resolve('react-client/dist/home.html')))
 })
 
 app.post('/signup', function(req, res) {

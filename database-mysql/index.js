@@ -106,10 +106,23 @@ const insertUser = function(user) {
   })
 }
 
+const getUser = function(username) {
+  return Users.findOne({where: {username: username}}).then((user) => {
+    if (user === null) {
+      console.log('no user found')
+      return null
+    } else {
+      console.log('found user')
+      return user;
+    }
+  })
+}
+
 module.exports = {
   insertFighter,
   getFighters,
   removeFighter,
   getNameList,
-  insertUser
+  insertUser,
+  getUser
 }

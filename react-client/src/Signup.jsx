@@ -50,7 +50,9 @@ class Signup extends React.Component {
             <button className="btn btn-outline-secondary registerBtn" formAction = '/register' formMethod = 'post'> Register </button>
 
           </form>
+          <p className = 'loginText'>Don't have an account? Registering is easy! Simply choose a name and password and hit register. No email verification or password complexity required.</p>
         </div>
+
       </div>
     )
   }
