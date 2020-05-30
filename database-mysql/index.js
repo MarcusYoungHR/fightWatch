@@ -99,8 +99,8 @@ const removeFighter = function(name) {
 }
 
 const insertUser = function(user) {
-  return Users.create(user).then(() => {
-    console.log('inserted user')
+  return Users.create(user, {raw: true}).then((boozer) => {
+    return boozer.dataValues.id
   }).catch((err) => {
     console.log('error inserting user \n', err);
   })

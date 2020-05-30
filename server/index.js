@@ -37,7 +37,7 @@ app.use(expressSession({
   saveUninitialized: false,
   resave: false,
   cookie: {
-    maxAge: 1000 * 60 * 60 * 24,
+    maxAge: 1000 * 60 * 60 * 24 * 30,
     secure: false
   },
   name: 'fightWatchId'
@@ -51,8 +51,10 @@ var transposeName = function(name) { //helper function to tranpose names so they
 
 const redirectLogin = (req, res, next) => { //custom middleware i define
     if (!req.session.userId) { //true if session object is uninitialized, ie we didnt put any data on the sessions object. checking to see if the user is logged in or not
-      res.redirect('/login') //redirects to the login page if the user is not logged in
+      console.log('redirectLogin: \nuser is NOT logged in')
+      res.redirect('/') //redirects to the login page if the user is not logged in
     } else { //if the user is logged in
+      console.log('redirectLogin: \nuser is logged in')
       next() //move onto next middleware
     }
   }
@@ -89,13 +91,25 @@ app.post('/register', (req, res) => {
   //   if (user === null) {//if there is no matching user
   //     insertUser(userData)//insert the user into the users table
   //     req.session.userId = userData.username//set user.id on the request object
-  //     myStore.set()//insert the session into the session table
   //     //redirect to /home
   //   }//if there is a matching user
   //     //redirect to /register
   // })
-  req.session.userId = 'hello'
-  res.end()
+  const userData = {username: req.body.username, password: req.body.password}
+
+  getUser(userData.username).then((user) => {
+    if (user === null) {
+      insertUser(userData).then((userId) => {
+        req.session.userId = userId;
+        res.redirect('/home');
+      })
+    } else {
+      res.redirect('/')
+    }
+  })
+
+  // console.log(req.session);
+  // res.end()
 })
 
 app.get('/home', redirectLogin, (req, res) => {
