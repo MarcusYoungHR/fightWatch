@@ -50,6 +50,9 @@ var users = {
   },
   password: {
     type: Sequelize.STRING
+  },
+  sid :{
+    type: Sequelize.STRING
   }
 }
 
@@ -99,14 +102,14 @@ const removeFighter = function(name) {
 }
 
 const insertUser = function(user) {
-  return Users.create(user, {raw: true}).then((boozer) => {
-    return boozer.dataValues.id
+  return Users.create(user, {raw: true}).then((data) => {
+    return data.dataValues.id
   }).catch((err) => {
     console.log('error inserting user \n', err);
   })
 }
 
-const getUser = function(username) {
+const registerGetUser = function(username) {
   return Users.findOne({where: {username: username}}).then((user) => {
     if (user === null) {
       console.log('no user found')
@@ -118,11 +121,25 @@ const getUser = function(username) {
   })
 }
 
+const loginGetUser = function(user) {
+  const {username, password} = user
+  return Users.findOne({where: {username: username, password: password}, raw: true}).then((data) => {
+    if (data === null) {
+      console.log('incorrect login info')
+      return null
+    } else {
+      console.log('successfully logged in')
+      return data
+    }
+  })
+}
+
 module.exports = {
   insertFighter,
   getFighters,
   removeFighter,
   getNameList,
   insertUser,
-  getUser
+  registerGetUser,
+  loginGetUser
 }

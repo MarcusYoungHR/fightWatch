@@ -5,7 +5,7 @@ const request = require('request');
 var sherdog = require('sherdog');
 var cookieParser = require('cookie-parser');
 var expressSession = require('express-session');
-const {insertFighter, getFighters, removeFighter, getNameList, insertUser, getUser} = require('../database-mysql/index.js')
+const {insertFighter, getFighters, removeFighter, getNameList, insertUser, registerGetUser, loginGetUser} = require('../database-mysql/index.js')
 const path = require('path')
 
 var SequelizeStore = require('connect-session-sequelize')(expressSession.Store);
@@ -80,9 +80,20 @@ app.get('/search', function (req, res) { //search sherdog for mma fighter
 });
 
 app.post('/login', (req, res) => {
-  req.session.userId = 'hello'
-
+  const userData = {username: req.body.username, password: req.body.password}
+  console.log('request session \n', req.session)
+  loginGetUser(userData).then((data) => {
+    //console.log('express login data \n', data);
+    myStore.get(data.sid, (err, session) => {
+      if (err) {
+        console.log('error in looking up session \n', err)
+      } else {
+        console.log('successfully looked up session \n', session.cookie)
+      }
+    })
+  })
 })
+
 
 app.post('/register', (req, res) => {
   //what am i trying to do
@@ -95,9 +106,9 @@ app.post('/register', (req, res) => {
   //   }//if there is a matching user
   //     //redirect to /register
   // })
-  const userData = {username: req.body.username, password: req.body.password}
+  const userData = {username: req.body.username, password: req.body.password, sid: req.sessionID}
 
-  getUser(userData.username).then((user) => {
+  registerGetUser(userData.username).then((user) => {
     if (user === null) {
       insertUser(userData).then((userId) => {
         req.session.userId = userId;
@@ -107,9 +118,6 @@ app.post('/register', (req, res) => {
       res.redirect('/')
     }
   })
-
-  // console.log(req.session);
-  // res.end()
 })
 
 app.get('/home', redirectLogin, (req, res) => {
