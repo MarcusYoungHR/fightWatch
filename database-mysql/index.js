@@ -50,9 +50,6 @@ var users = {
   },
   password: {
     type: Sequelize.STRING
-  },
-  sid :{
-    type: Sequelize.STRING
   }
 }
 
@@ -115,7 +112,7 @@ const registerGetUser = function(username) {
       console.log('no user found')
       return null
     } else {
-      console.log('found user')
+      console.log('found user when trying to register')
       return user;
     }
   })
