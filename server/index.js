@@ -112,11 +112,8 @@ app.post('/login', (req, res) => {
       req.session.save(()=> {
         res.redirect('/home')
       })
-
     }
   })
-
-
 })
 
 

@@ -102,9 +102,7 @@ class App extends React.Component {
       return (
         <div>
           <h1>Fight Watch!</h1>
-          <button>
 
-          </button>
           <form>
             <input type='text' placeholder='insert fighter url...' onChange={(event) => {
               //</form>console.log(event.target)
@@ -121,10 +119,7 @@ class App extends React.Component {
               this.onSubmit()
             }}>UFC</button>
           </form>
-          <button onClick={(event) => {
-            event.preventDefault();
-            this.onClick()
-          }}>TEST</button>
+
           <List items={this.state.fighters} removeHandler={this.removeHandler}></List>
         </div>
       )

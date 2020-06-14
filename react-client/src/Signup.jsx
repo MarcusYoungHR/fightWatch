@@ -27,30 +27,30 @@ class Signup extends React.Component {
     return (
       <div>
 
-        <div className = 'eyeShape'></div>
-
-        <h1 className = 'signUpHeader'>Login</h1>
+        <div className='eyeShape'></div>
 
         <div className='mx-auto loginForm'>
 
-          <form action = '/login' method = 'post'>
+          <h1 className='signUpHeader'>Login</h1>
 
-            <input className = 'loginInput' type='text' placeholder='user name' id = 'username' name = 'username' onChange={(event) => {
+          <form action='/login' method='post'>
+
+            <input className='loginInput' type='text' placeholder='user name' id='username' name='username' onChange={(event) => {
               this.changeHandler('username', event.target.value)
             }}>
             </input>
 
-            <input className = 'loginInput' type='text' placeholder='password' id = 'password' name = 'password' onChange={(event) => {
+            <input className='loginInput' type='text' placeholder='password' id='password' name='password' onChange={(event) => {
               this.changeHandler('password', event.target.value)
             }}>
             </input>
 
             <button className="loginBtn btn btn-outline-secondary"> Login </button>
 
-            <button className="btn btn-outline-secondary registerBtn" formAction = '/register' formMethod = 'post'> Register </button>
+            <button className="btn btn-outline-secondary registerBtn" formAction='/register' formMethod='post'> Register </button>
 
           </form>
-          <p className = 'loginText'>Don't have an account? Registering is easy! Simply choose a name and password and hit register. No email verification or password complexity required.</p>
+          <p className='loginText'>Don't have an account? Registering is easy! Simply choose a name and password and hit register. No email verification or password complexity required.</p>
         </div>
 
       </div>
