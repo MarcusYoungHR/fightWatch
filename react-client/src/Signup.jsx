@@ -45,9 +45,9 @@ class Signup extends React.Component {
             }}>
             </input>
 
-            <button className="loginBtn btn btn-outline-secondary"> Login </button>
+            <button className="loginBtn btn btn-dark"> Login </button>
 
-            <button className="btn btn-outline-secondary registerBtn" formAction='/register' formMethod='post'> Register </button>
+            <button className="btn btn-dark registerBtn" formAction='/register' formMethod='post'> Register </button>
 
           </form>
           <p className='loginText'>Don't have an account? Registering is easy! Simply choose a name and password and hit register. No email verification or password complexity required.</p>
