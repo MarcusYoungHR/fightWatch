@@ -101,29 +101,41 @@ class App extends React.Component {
     })
   }
 
+
+
   render() {
 
     return (
       <div>
-        <div style={{ backgroundColor: 'rgb(168, 36, 36)', paddingBottom: '10px', paddingTop: '10px', marginBottom: '10px'}}>
-          <div className='mx-auto' style={{backgroundColor: 'rgb(242, 242, 242)', width: 'max-content', padding: '10px'}}>
+        <div className="input-group" style={{position:' absolute', zIndex: '1'}}>
+          <div className="input-group-append" id="button-addon4" style={{margin: '10px'}}>
+            <form action='/logout' method='post'>
+              <button className="btn btn-dark" type="submit">Log Out</button>
+              <button className="btn btn-dark" type="button">Feedback</button>
+            </form>
+
+          </div>
+        </div>
+        <div style={{ backgroundColor: 'rgb(168, 36, 36)', paddingBottom: '10px', paddingTop: '10px', marginBottom: '10px' }}>
+          <div className='mx-auto' style={{ backgroundColor: 'rgb(242, 242, 242)', width: 'max-content', padding: '10px' }}>
             <h1 style={{ textAlign: 'center' }}>F I G H T &nbsp;&nbsp;&nbsp; W A T C H</h1>
 
-            <form className='mx-auto' style={{ position: 'relative', width: '300px' }}>
-              <input type='text' placeholder='fighter name' onChange={(event) => {
+            <div className="input-group">
+              <input type="text" className="form-control" placeholder="Fighter name" aria-label="Recipient's username with two button addons" aria-describedby="button-addon4" onChange={(event) => {
                 this.onChange(event.target.value);
               }}></input>
+              <div className="input-group-append" id="button-addon4">
+                <button className="btn btn-dark" type="button" onClick={(event) => {
+                  event.preventDefault();
+                  this.onBoxerSubmit()
+                }}>Boxing</button>
+                <button className="btn btn-dark" type="button" onClick={(event) => {
+                  event.preventDefault();
+                  this.onSubmit()
+                }}>UFC</button>
+              </div>
+            </div>
 
-              <button onClick={(event) => {
-                event.preventDefault();
-                this.onBoxerSubmit()
-              }
-              }>Boxing</button>
-              <button onClick={(event) => {
-                event.preventDefault();
-                this.onSubmit()
-              }}>UFC</button>
-            </form>
           </div>
         </div>
 
@@ -142,3 +154,20 @@ class App extends React.Component {
 }
 
 ReactDOM.render(<App />, document.getElementById('app'));
+
+
+/* <form className='mx-auto' style={{ position: 'relative', width: '300px' }}>
+  <input type='text' placeholder='fighter name' onChange={(event) => {
+    this.onChange(event.target.value);
+  }}></input>
+
+  <button className="btn btn-dark" onClick={(event) => {
+    event.preventDefault();
+    this.onBoxerSubmit()
+  }}
+  >Boxing</button>
+  <button className="btn btn-dark" style ={{width: '10px'}} onClick={(event) => {
+    event.preventDefault();
+    this.onSubmit()
+  }}>UFC</button>
+</form> */

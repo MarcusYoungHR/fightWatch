@@ -144,6 +144,14 @@ app.post('/register', (req, res) => {
   })
 })
 
+app.post('/logout', redirectLogin, (req, res) => {
+  console.log('logout endpoint hit')
+  req.session.destroy(()=> {
+    res.clearCookie('fightWatchId')
+    res.redirect('/')
+  })
+})
+
 app.get('/home', redirectLogin, (req, res) => {
   res.sendFile((path.resolve('react-client/dist/home.html')))
 })
