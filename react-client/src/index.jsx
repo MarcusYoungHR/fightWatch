@@ -116,7 +116,7 @@ class App extends React.Component {
 
           </div>
         </div>
-        <div style={{ backgroundColor: 'rgb(168, 36, 36)', paddingBottom: '10px', paddingTop: '10px', marginBottom: '10px' }}>
+        <div style={{ backgroundColor: 'rgb(102, 102, 102)', paddingBottom: '10px', paddingTop: '10px', marginBottom: '10px' }}>
           <div className='mx-auto' style={{ backgroundColor: 'rgb(242, 242, 242)', width: 'max-content', padding: '10px' }}>
             <h1 style={{ textAlign: 'center' }}>F I G H T &nbsp;&nbsp;&nbsp; W A T C H</h1>
 

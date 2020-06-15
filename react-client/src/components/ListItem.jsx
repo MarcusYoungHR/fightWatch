@@ -8,7 +8,7 @@ const ListItem = (props) => {
     props.item.next_opponent = 'TBA';
   }
   return (
-    <div className="card mx-auto" style = {{width: '14rem'}}>
+    <div className="card" style = {{width: '14rem'}}>
       <div style={{height: '280px', overflow: 'hidden'}}>
         <img src={props.item.image} className="card-img-top"></img>
       </div>
