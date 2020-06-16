@@ -92,7 +92,7 @@ app.get('/search', function (req, res) { //search sherdog for mma fighter
   request(`https://www.googleapis.com/customsearch/v1?key=AIzaSyAgLmwFLMuqANxoLxNVrILaslMuNUy9DF8&cx=007218699401475344710:xatgqbhqag0&q=${string}`, function (err, response, body) {
     var url = JSON.parse(body).items[0].link;
     sherdog.getFighter(url, function (data) {
-      insertFighter(data).then((data) => {
+      insertFighter(data, req.session.userId).then((data) => {
         res.end()
       });
     })
@@ -165,11 +165,6 @@ app.post('/signup', function (req, res) {
   res.end()
 })
 
-app.post('/sessionTest', function (req, res) {
-  req.session.userId = 'buttplug'
-  res.end()
-})
-
 app.get('/load', function (req, res) {
   getFighters().then(function (data) {
     res.send(data);
@@ -181,7 +176,7 @@ app.get('/boxer', function (req, res) { //search boxrec for boxer
   request(`https://www.googleapis.com/customsearch/v1?key=AIzaSyAgLmwFLMuqANxoLxNVrILaslMuNUy9DF8&cx=007218699401475344710:d2e5d7wqupx&q=${string}`, function (err, response, body) {
     var url = JSON.parse(body).items[0].link
     sherdog.getBoxer(url, function (guy) {
-      insertFighter(guy).then((data) => {
+      insertFighter(guy, req.session.userId).then((data) => {
         console.log(guy)
         res.send(guy)
       })

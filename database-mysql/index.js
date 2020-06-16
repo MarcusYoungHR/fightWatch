@@ -53,18 +53,56 @@ var users = {
   }
 }
 
-const Fighters = sequelize.define('fighters', model)
-const Users = sequelize.define('users', users);
+const Fighters = sequelize.define('Fighters', model)
+const Users = sequelize.define('Users', users);
+
+Fighters.belongsTo(Users)
+Users.hasMany(Fighters);
 
 Users.sync()
 Fighters.sync()
 //creates the table if it doesn't exist
 
-const insertFighter = function(obj) {
-  return Fighters.upsert(obj).then(function(data) {
-    console.log('inserted a fighter \n', data)
-  }).catch(function(err) {
-    console.log('failed to insert: \n', err);
+
+
+// const insertFighter = function(obj) {
+//   return Fighters.upsert(obj, {returning: true}).then(function(data) {
+//     console.log('inserted a fighter \n', data)
+//     return Users.findOne({
+//       where: {
+//         id: 1
+//       }
+//     }).then((user) => {
+//       //console.log('please work data \n', data, '\nplease work user \n', user)
+//       return user.setFighters()
+//     }).then((something) => {
+//       console.log('associated fighter with user \n', data)
+//     }).catch((err) => {
+//       console.log('error in associating \n', err);
+//     })
+//   }).catch(function(err) {
+//     console.log('failed to insert: \n', err);
+//   })
+// }
+
+const insertFighter = function(obj, sessId) {
+  return Fighters.create(obj, {returning: true}).then((fighter) => {
+    console.log('inserted a fighter \n', fighter);
+    return Users.findOne({
+      where: {
+        id: sessId
+      }
+    }).then((user) => {
+      return user.setFighters(fighter)
+    }).then((success)=> {
+      console.log('user fighter join success \n', success)
+      return
+    }).catch((err)=> {
+      console.log('user fighter join error \n', err)
+      return
+    })
+  }).catch((err)=> {
+    console.log('error inserting fighter \n', err);
   })
 }
 
