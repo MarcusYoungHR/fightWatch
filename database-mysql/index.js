@@ -53,17 +53,116 @@ var users = {
   }
 }
 
-const Fighters = sequelize.define('Fighters', model)
-const Users = sequelize.define('Users', users);
+const Fighter = sequelize.define('Fighters', model)
+const User = sequelize.define('Users', users);
 
-Fighters.belongsTo(Users)
-Users.hasMany(Fighters);
+Fighter.belongsTo(User)
+//User.belongsTo(Fighter);
+//Fighter.hasMany(User)
+User.hasMany(Fighter);
 
-Users.sync()
-Fighters.sync()
+// Fighter.belongsToMany(User, {through: 'UserFighter'})
+// User.belongsToMany(Fighter, {through: 'UserFighter'})
+
+
+
+sequelize.sync({force: true})
 //creates the table if it doesn't exist
 
+const insertFighter = function(obj, sessId) {
+  return Fighter.create(obj, {returning: true}).then((fighterData) => {
+    //console.log('inserted a fighter \n', fighterData);
+    return User.findOne({
+      where: {
+        id: sessId
+      }
+    }).then((userData) => {
+      //console.log('fighterData in findOne promise \n', fighterData)
+      return fighterData.setUser(userData)
+    }).then((success)=> {
+      console.log('user fighter join success')
+      return
+    }).catch((err)=> {
+      console.log('user fighter join error \n', err)
+      return
+    })
+  }).catch((err)=> {
+    console.log('error inserting fighter \n', err);
+  })
+}
 
+const getFighters = function() {
+  return Fighter.findAll().then(function(data) {
+    console.log('retreived fighter list')
+    return data;
+  }).catch(function(err) {
+    console.log('failed to retrieve list: \n', err);
+  })
+}
+
+const getNameList = function() {
+  return Fighter.findAll({attributes: ['name', 'style'], raw: true}).then(function(data) {
+    console.log('retreived fighter names \n', data)
+    return data
+  }).catch(function(err) {
+    console.log('failed to retrieve fighter names \n', err)
+  })
+}
+
+const removeFighter = function(name) {
+  return Fighter.destroy({
+    where: {
+      name: name
+    }
+  }).then(()=> {
+    console.log('fighter removed')
+  }).catch((err)=> {
+    console.log('failed to remove fighter: \n', err)
+  })
+}
+
+const insertUser = function(user) {
+  return User.create(user, {raw: true}).then((data) => {
+    return data.dataValues.id
+  }).catch((err) => {
+    console.log('error inserting user \n', err);
+  })
+}
+
+const registerGetUser = function(username) {
+  return User.findOne({where: {username: username}}).then((user) => {
+    if (user === null) {
+      console.log('no user found')
+      return null
+    } else {
+      console.log('found user when trying to register')
+      return user;
+    }
+  })
+}
+
+const loginGetUser = function(user) {
+  const {username, password} = user
+  return User.findOne({where: {username: username, password: password}, raw: true}).then((data) => {
+    if (data === null) {
+      console.log('incorrect login info')
+      return null
+    } else {
+      console.log('successfully logged in')
+      return data
+    }
+  })
+}
+
+module.exports = {
+  insertFighter,
+  getFighters,
+  removeFighter,
+  getNameList,
+  insertUser,
+  registerGetUser,
+  loginGetUser
+}
 
 // const insertFighter = function(obj) {
 //   return Fighters.upsert(obj, {returning: true}).then(function(data) {
@@ -84,97 +183,3 @@ Fighters.sync()
 //     console.log('failed to insert: \n', err);
 //   })
 // }
-
-const insertFighter = function(obj, sessId) {
-  return Fighters.create(obj, {returning: true}).then((fighter) => {
-    console.log('inserted a fighter \n', fighter);
-    return Users.findOne({
-      where: {
-        id: sessId
-      }
-    }).then((user) => {
-      return user.setFighters(fighter)
-    }).then((success)=> {
-      console.log('user fighter join success \n', success)
-      return
-    }).catch((err)=> {
-      console.log('user fighter join error \n', err)
-      return
-    })
-  }).catch((err)=> {
-    console.log('error inserting fighter \n', err);
-  })
-}
-
-const getFighters = function() {
-  return Fighters.findAll().then(function(data) {
-    console.log('retreived fighter list')
-    return data;
-  }).catch(function(err) {
-    console.log('failed to retrieve list: \n', err);
-  })
-}
-
-const getNameList = function() {
-  return Fighters.findAll({attributes: ['name', 'style'], raw: true}).then(function(data) {
-    console.log('retreived fighter names \n', data)
-    return data
-  }).catch(function(err) {
-    console.log('failed to retrieve fighter names \n', err)
-  })
-}
-
-const removeFighter = function(name) {
-  return Fighters.destroy({
-    where: {
-      name: name
-    }
-  }).then(()=> {
-    console.log('fighter removed')
-  }).catch((err)=> {
-    console.log('failed to remove fighter: \n', err)
-  })
-}
-
-const insertUser = function(user) {
-  return Users.create(user, {raw: true}).then((data) => {
-    return data.dataValues.id
-  }).catch((err) => {
-    console.log('error inserting user \n', err);
-  })
-}
-
-const registerGetUser = function(username) {
-  return Users.findOne({where: {username: username}}).then((user) => {
-    if (user === null) {
-      console.log('no user found')
-      return null
-    } else {
-      console.log('found user when trying to register')
-      return user;
-    }
-  })
-}
-
-const loginGetUser = function(user) {
-  const {username, password} = user
-  return Users.findOne({where: {username: username, password: password}, raw: true}).then((data) => {
-    if (data === null) {
-      console.log('incorrect login info')
-      return null
-    } else {
-      console.log('successfully logged in')
-      return data
-    }
-  })
-}
-
-module.exports = {
-  insertFighter,
-  getFighters,
-  removeFighter,
-  getNameList,
-  insertUser,
-  registerGetUser,
-  loginGetUser
-}
