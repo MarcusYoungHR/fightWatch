@@ -61,16 +61,16 @@ const User = sequelize.define('Users', users);
 // //Fighter.hasMany(User)
 // User.hasMany(Fighter);
 
-Fighter.belongsToMany(User, {through: 'UserFighter'})
-User.belongsToMany(Fighter, {through: 'UserFighter'})
+Fighter.belongsToMany(User, { through: 'UserFighter' })
+User.belongsToMany(Fighter, { through: 'UserFighter' })
 
 
-
-sequelize.sync({force: true})
+sequelize.sync()
+// sequelize.sync({ force: true }) //i think force:true drops tables
 //creates the table if it doesn't exist
 
-const insertFighter = function(obj, sessId) {
-  return Fighter.create(obj, {returning: true}).then((fighterData) => {
+const insertFighter = function (obj, sessId) {
+  return Fighter.create(obj, { returning: true }).then((fighterData) => {
     //console.log('inserted a fighter \n', fighterData);
     return User.findOne({
       where: {
@@ -80,62 +80,98 @@ const insertFighter = function(obj, sessId) {
       //console.log('fighterData in findOne promise \n', fighterData)
       //return fighterData.setUser(userData)
       return userData.addFighter(fighterData)
-    }).then((success)=> {
+    }).then((success) => {
       console.log('user fighter join success')
       return
-    }).catch((err)=> {
+    }).catch((err) => {
       console.log('user fighter join error \n', err)
       return
     })
-  }).catch((err)=> {
+  }).catch((err) => {
     console.log('error inserting fighter \n', err);
   })
 }
 
-const associateFighter = function(fighter, sessId) {
-  
-}
-
-const getFighters = function() {
-  return Fighter.findAll().then(function(data) {
-    console.log('retreived fighter list')
-    return data;
-  }).catch(function(err) {
-    console.log('failed to retrieve list: \n', err);
+const associateFighter = function (fighterData, sessId) {
+  return User.findOne({where: {id: sessId}}).then((userData)=> {
+    return userData.addFighter(fighterData)
+  }).then(()=> {
+    console.log('associateFighter says: successfully associated fighter')
+    return
+  }).catch((err)=> {
+    console.log('associateFighter says: error associating fighter \n', err)
+    return
   })
 }
 
-const getNameList = function() {
-  return Fighter.findAll({attributes: ['name', 'style'], raw: true}).then(function(data) {
+// const getFighters = function () {
+//   return Fighter.findAll().then(function (data) {
+//     console.log('retreived fighter list')
+//     return data;
+//   }).catch(function (err) {
+//     console.log('failed to retrieve list: \n', err);
+//   })
+// }
+
+const getFighters = function(sessId) {
+  return User.findOne({
+    where: {id: sessId},
+    include: [{
+      model: Fighter,
+      through: {
+        attributes: []
+      }
+    }]
+  }).then((data)=> {
+    return JSON.parse(JSON.stringify(data, null, 2)).Fighters
+  })
+}
+
+const getSingleFighter = function (fighter) {
+  return Fighter.findOne({
+    where: {
+      name: fighter.name,
+      style: fighter.style
+    }
+  }).then((data) => {
+    console.log('getSingleFighter data: \n', data)
+    return data
+  })
+}
+
+
+
+const getNameList = function () {
+  return Fighter.findAll({ attributes: ['name', 'style'], raw: true }).then(function (data) {
     console.log('retreived fighter names \n', data)
     return data
-  }).catch(function(err) {
+  }).catch(function (err) {
     console.log('failed to retrieve fighter names \n', err)
   })
 }
 
-const removeFighter = function(name) {
+const removeFighter = function (name) {
   return Fighter.destroy({
     where: {
       name: name
     }
-  }).then(()=> {
+  }).then(() => {
     console.log('fighter removed')
-  }).catch((err)=> {
+  }).catch((err) => {
     console.log('failed to remove fighter: \n', err)
   })
 }
 
-const insertUser = function(user) {
-  return User.create(user, {raw: true}).then((data) => {
+const insertUser = function (user) {
+  return User.create(user, { raw: true }).then((data) => {
     return data.dataValues.id
   }).catch((err) => {
     console.log('error inserting user \n', err);
   })
 }
 
-const registerGetUser = function(username) {
-  return User.findOne({where: {username: username}}).then((user) => {
+const registerGetUser = function (username) {
+  return User.findOne({ where: { username: username } }).then((user) => {
     if (user === null) {
       console.log('no user found')
       return null
@@ -146,9 +182,9 @@ const registerGetUser = function(username) {
   })
 }
 
-const loginGetUser = function(user) {
-  const {username, password} = user
-  return User.findOne({where: {username: username, password: password}, raw: true}).then((data) => {
+const loginGetUser = function (user) {
+  const { username, password } = user
+  return User.findOne({ where: { username: username, password: password }, raw: true }).then((data) => {
     if (data === null) {
       console.log('incorrect login info')
       return null
@@ -166,7 +202,9 @@ module.exports = {
   getNameList,
   insertUser,
   registerGetUser,
-  loginGetUser
+  loginGetUser,
+  getSingleFighter,
+  associateFighter
 }
 
 // const insertFighter = function(obj) {

@@ -5,7 +5,7 @@ const request = require('request');
 var sherdog = require('sherdog');
 var cookieParser = require('cookie-parser');
 var expressSession = require('express-session');
-const { insertFighter, getFighters, removeFighter, getNameList, insertUser, registerGetUser, loginGetUser } = require('../database-mysql/index.js')
+const { insertFighter, getFighters, removeFighter, getNameList, insertUser, registerGetUser, loginGetUser, getSingleFighter, associateFighter } = require('../database-mysql/index.js')
 const path = require('path')
 
 var SequelizeStore = require('connect-session-sequelize')(expressSession.Store);
@@ -52,6 +52,10 @@ var transposeName = function (name) { //helper function to tranpose names so the
   return transposed;
 }
 
+const capitalizeWords = function (str) {
+  return str.replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
+}
+
 const redirectLogin = (req, res, next) => { //custom middleware i define
   if (!req.session.userId) { //true if session object is uninitialized, ie we didnt put any data on the sessions object. checking to see if the user is logged in or not
     console.log('redirectLogin: user is NOT logged in ')
@@ -88,15 +92,29 @@ app.get('/', redirectHome, (req, res) => {
 
 
 app.get('/search', function (req, res) { //search sherdog for mma fighter
-  var string = transposeName(req.query.fighter);
-  request(`https://www.googleapis.com/customsearch/v1?key=AIzaSyAgLmwFLMuqANxoLxNVrILaslMuNUy9DF8&cx=007218699401475344710:xatgqbhqag0&q=${string}`, function (err, response, body) {
-    var url = JSON.parse(body).items[0].link;
-    sherdog.getFighter(url, function (data) {
-      insertFighter(data, req.session.userId).then((data) => {
+  let string = capitalizeWords(req.query.fighter.toLowerCase());
+  console.log(string)
+  getSingleFighter({ name: string, style: 'mma' }).then((data) => {
+    if (data === null) {
+      string = transposeName(string)
+      console.log('fighter not found in database')
+      request(`https://www.googleapis.com/customsearch/v1?key=AIzaSyAgLmwFLMuqANxoLxNVrILaslMuNUy9DF8&cx=007218699401475344710:xatgqbhqag0&q=${string}`, function (err, response, body) {
+        var url = JSON.parse(body).items[0].link;
+        sherdog.getFighter(url, function (data) {
+          insertFighter(data, req.session.userId).then((data) => {
+            res.end()
+          });
+        })
+      })
+    } else {
+      console.log('fighter found in database')
+      associateFighter(data, req.session.userId).then(()=> {
         res.end()
       });
-    })
+    }
   })
+  //var string = transposeName(req.query.fighter);
+
 });
 
 app.post('/login', (req, res) => {
@@ -109,7 +127,7 @@ app.post('/login', (req, res) => {
       res.redirect('/')
     } else {
       req.session.userId = data.id
-      req.session.save(()=> {
+      req.session.save(() => {
         res.redirect('/home')
       })
     }
@@ -134,7 +152,7 @@ app.post('/register', (req, res) => {
     if (user === null) {
       insertUser(userData).then((userId) => {
         req.session.userId = userId;
-        req.session.save(()=> {
+        req.session.save(() => {
           res.redirect('/home')
         })
       })
@@ -146,7 +164,7 @@ app.post('/register', (req, res) => {
 
 app.post('/logout', redirectLogin, (req, res) => {
   console.log('logout endpoint hit')
-  req.session.destroy(()=> {
+  req.session.destroy(() => {
     res.clearCookie('fightWatchId')
     res.redirect('/')
   })
@@ -166,21 +184,32 @@ app.post('/signup', function (req, res) {
 })
 
 app.get('/load', function (req, res) {
-  getFighters().then(function (data) {
+  getFighters(req.session.userId).then(function (data) {
     res.send(data);
   })
 })
 
 app.get('/boxer', function (req, res) { //search boxrec for boxer
-  var string = transposeName(req.query.fighter);
-  request(`https://www.googleapis.com/customsearch/v1?key=AIzaSyAgLmwFLMuqANxoLxNVrILaslMuNUy9DF8&cx=007218699401475344710:d2e5d7wqupx&q=${string}`, function (err, response, body) {
-    var url = JSON.parse(body).items[0].link
-    sherdog.getBoxer(url, function (guy) {
-      insertFighter(guy, req.session.userId).then((data) => {
-        console.log(guy)
-        res.send(guy)
+  let string = capitalizeWords(req.query.fighter.toLowerCase());
+  getSingleFighter({name: string, style: 'boxing'}).then((data)=> {
+    if (data === null) {
+      console.log('boxer not found in database')
+      var string = transposeName(req.query.fighter);
+      request(`https://www.googleapis.com/customsearch/v1?key=AIzaSyAgLmwFLMuqANxoLxNVrILaslMuNUy9DF8&cx=007218699401475344710:d2e5d7wqupx&q=${string}`, function (err, response, body) {
+        var url = JSON.parse(body).items[0].link
+        sherdog.getBoxer(url, function (guy) {
+          insertFighter(guy, req.session.userId).then((data) => {
+            console.log(guy)
+            res.send(guy)
+          })
+        })
       })
-    })
+    } else {
+      console.log('fighter found in database')
+      associateFighter(data, req.session.userId).then(()=> {
+        res.end()
+      })
+    }
   })
 })
 
