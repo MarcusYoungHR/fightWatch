@@ -56,13 +56,13 @@ var users = {
 const Fighter = sequelize.define('Fighters', model)
 const User = sequelize.define('Users', users);
 
-Fighter.belongsTo(User)
-//User.belongsTo(Fighter);
-//Fighter.hasMany(User)
-User.hasMany(Fighter);
+// Fighter.belongsTo(User)
+// //User.belongsTo(Fighter);
+// //Fighter.hasMany(User)
+// User.hasMany(Fighter);
 
-// Fighter.belongsToMany(User, {through: 'UserFighter'})
-// User.belongsToMany(Fighter, {through: 'UserFighter'})
+Fighter.belongsToMany(User, {through: 'UserFighter'})
+User.belongsToMany(Fighter, {through: 'UserFighter'})
 
 
 
@@ -78,7 +78,8 @@ const insertFighter = function(obj, sessId) {
       }
     }).then((userData) => {
       //console.log('fighterData in findOne promise \n', fighterData)
-      return fighterData.setUser(userData)
+      //return fighterData.setUser(userData)
+      return userData.addFighter(fighterData)
     }).then((success)=> {
       console.log('user fighter join success')
       return
@@ -89,6 +90,10 @@ const insertFighter = function(obj, sessId) {
   }).catch((err)=> {
     console.log('error inserting fighter \n', err);
   })
+}
+
+const associateFighter = function(fighter, sessId) {
+  
 }
 
 const getFighters = function() {
