@@ -214,7 +214,7 @@ app.get('/boxer', function (req, res) { //search boxrec for boxer
 })
 
 app.delete('/search', function (req, res) { //delete fighter from database
-  removeFighter(req.body.fighter).then(() => {
+  removeFighter(req.body.fighter, req.session.userId).then(() => {
     res.end();
   })
 })

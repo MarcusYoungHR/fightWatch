@@ -96,10 +96,10 @@ const associateFighter = function (fighterData, sessId) {
   return User.findOne({where: {id: sessId}}).then((userData)=> {
     return userData.addFighter(fighterData)
   }).then(()=> {
-    console.log('associateFighter says: successfully associated fighter')
+    console.log('associateFighter: successfully associated fighter')
     return
   }).catch((err)=> {
-    console.log('associateFighter says: error associating fighter \n', err)
+    console.log('associateFighter: error associating fighter \n', err)
     return
   })
 }
@@ -116,14 +116,16 @@ const associateFighter = function (fighterData, sessId) {
 const getFighters = function(sessId) {
   return User.findOne({
     where: {id: sessId},
-    include: [{
+    include: {
       model: Fighter,
       through: {
         attributes: []
       }
-    }]
+    }
   }).then((data)=> {
     return JSON.parse(JSON.stringify(data, null, 2)).Fighters
+  }).catch((err)=> {
+    console.log('getFighters err \n', err)
   })
 }
 
@@ -139,8 +141,6 @@ const getSingleFighter = function (fighter) {
   })
 }
 
-
-
 const getNameList = function () {
   return Fighter.findAll({ attributes: ['name', 'style'], raw: true }).then(function (data) {
     console.log('retreived fighter names \n', data)
@@ -150,15 +150,31 @@ const getNameList = function () {
   })
 }
 
-const removeFighter = function (name) {
-  return Fighter.destroy({
-    where: {
-      name: name
-    }
-  }).then(() => {
-    console.log('fighter removed')
-  }).catch((err) => {
-    console.log('failed to remove fighter: \n', err)
+// const removeFighter = function (name) {
+//   return Fighter.destroy({
+//     where: {
+//       name: name
+//     }
+//   }).then(() => {
+//     console.log('fighter removed')
+//   }).catch((err) => {
+//     console.log('failed to remove fighter: \n', err)
+//   })
+// }
+
+const removeFighter = function(name, sessId) {
+  return User.findOne({
+    where: {id: sessId}
+  }).then((userData)=> {
+    return Fighter.findOne({where: {name: name}}).then((fighterData)=> {
+      return userData.removeFighter(fighterData)
+    }).catch((err)=> {
+      console.log('nested removeFighter err \n', err)
+      return
+    })
+  }).catch((err)=> {
+    console.log('removeFighter err \n', err)
+    return
   })
 }
 
