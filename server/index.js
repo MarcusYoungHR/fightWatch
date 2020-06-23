@@ -7,6 +7,8 @@ var cookieParser = require('cookie-parser');
 var expressSession = require('express-session');
 const { insertFighter, getFighters, removeFighter, getNameList, insertUser, registerGetUser, loginGetUser, getSingleFighter, associateFighter } = require('../database-mysql/index.js')
 const path = require('path')
+const {downloadImg, transposeName, capitalizeWords, transposeImgName} = require('./utils.js')
+const {s3Uploader} = require('./s3Upload.js')
 
 var SequelizeStore = require('connect-session-sequelize')(expressSession.Store);
 
@@ -46,16 +48,6 @@ app.use(expressSession({
 
 app.use(express.static(__dirname + '/../react-client/dist'));
 
-
-var transposeName = function (name) { //helper function to tranpose names so they are google searchable
-  var transposed = name.replace(/ /g, '+');
-  return transposed;
-}
-
-const capitalizeWords = function (str) {
-  return str.replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
-}
-
 const redirectLogin = (req, res, next) => { //custom middleware i define
   if (!req.session.userId) { //true if session object is uninitialized, ie we didnt put any data on the sessions object. checking to see if the user is logged in or not
     console.log('redirectLogin: user is NOT logged in ')
@@ -93,7 +85,7 @@ app.get('/', redirectHome, (req, res) => {
 
 app.get('/search', function (req, res) { //search sherdog for mma fighter
   let string = capitalizeWords(req.query.fighter.toLowerCase());
-  console.log(string)
+  //console.log(string)
   getSingleFighter({ name: string, style: 'mma' }).then((data) => {
     if (data === null) {
       string = transposeName(string)
@@ -101,6 +93,9 @@ app.get('/search', function (req, res) { //search sherdog for mma fighter
       request(`https://www.googleapis.com/customsearch/v1?key=AIzaSyAgLmwFLMuqANxoLxNVrILaslMuNUy9DF8&cx=007218699401475344710:xatgqbhqag0&q=${string}`, function (err, response, body) {
         var url = JSON.parse(body).items[0].link;
         sherdog.getFighter(url, function (data) {
+          downloadImg(data.image, `./react-client/dist/images/${transposeImgName(data.name)}.jpg`, ()=> {
+            console.log('downloaded image')
+          }) //maybe fix this async between downloadImg and insertFighter
           insertFighter(data, req.session.userId).then((data) => {
             res.end()
           });

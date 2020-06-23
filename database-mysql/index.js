@@ -88,7 +88,10 @@ const insertFighter = function (obj, sessId) {
       return
     })
   }).catch((err) => {
-    console.log('error inserting fighter \n', err);
+    console.log('error inserting fighter \n'); //maybe start console logging error here again
+    return Fighter.findOne({where: {name: obj.name}}).then((fighterData)=> {
+      return associateFighter(fighterData, sessId)
+    })
   })
 }
 
