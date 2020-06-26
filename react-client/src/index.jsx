@@ -21,6 +21,7 @@ class App extends React.Component {
     this.onClick = this.onClick.bind(this);
     this.removeHandler = this.removeHandler.bind(this);
     this.onBoxerSubmit = this.onBoxerSubmit.bind(this);
+    this.removeBoxer = this.removeBoxer.bind(this)
   }
 
   componentDidMount() {
@@ -28,18 +29,10 @@ class App extends React.Component {
       url: '/load',
       success: (data) => {
         console.log('component did mount data: \n', data)
-        var mmaGuys = [];
-        var boxingGuys = [];
-        for (let i = 0; i < data.length; i++) {
-          if (data[i].style === 'mma') {
-            mmaGuys.push(data[i])
-          } else {
-            boxingGuys.push(data[i])
-          }
-        }
+
         this.setState({
-          fighters: mmaGuys,
-          boxers: boxingGuys
+          fighters: data[0],
+          boxers: data[1]
         })
       },
       error: (err) => {
@@ -101,7 +94,16 @@ class App extends React.Component {
     })
   }
 
-
+  removeBoxer(name) {
+    $.ajax({
+      url: '/boxer',
+      method: 'DELETE',
+      data: { fighter: name },
+      success: () => {
+        this.componentDidMount();
+      }
+    })
+  }
 
   render() {
 
@@ -142,7 +144,7 @@ class App extends React.Component {
         <div className="container">
           <div className="row">
             <List items={this.state.fighters} removeHandler={this.removeHandler}></List>
-            <ListBoxer items={this.state.boxers} removeHandler={this.removeHandler}></ListBoxer>
+            <ListBoxer items={this.state.boxers} removeHandler={this.removeBoxer}></ListBoxer>
           </div>
 
         </div>

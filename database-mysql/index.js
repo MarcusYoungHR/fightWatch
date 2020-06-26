@@ -38,6 +38,31 @@ var model = {
   }
 }
 
+var boxers = {
+  id: {
+    type: Sequelize.INTEGER,
+    autoIncrement: true,
+    primaryKey: true
+  },
+  name: {
+    type: Sequelize.STRING,
+    unique: true
+  },
+  next_fight: {
+    type: Sequelize.STRING,
+
+  },
+  next_opponent: {
+    type: Sequelize.STRING
+  },
+  image: {
+    type: Sequelize.STRING
+  },
+  style: {
+    type: Sequelize.STRING
+  }
+}
+
 var users = {
   id: {
     type: Sequelize.INTEGER,
@@ -53,6 +78,7 @@ var users = {
   }
 }
 
+const Boxer = sequelize.define('Boxers', boxers)
 const Fighter = sequelize.define('Fighters', model)
 const User = sequelize.define('Users', users);
 
@@ -63,6 +89,9 @@ const User = sequelize.define('Users', users);
 
 Fighter.belongsToMany(User, { through: 'UserFighter' })
 User.belongsToMany(Fighter, { through: 'UserFighter' })
+
+Boxer.belongsToMany(User, { through: 'UserBoxer' })
+User.belongsToMany(Boxer, { through: 'UserBoxer' })
 
 
 sequelize.sync()
@@ -89,20 +118,58 @@ const insertFighter = function (obj, sessId) {
     })
   }).catch((err) => {
     console.log('error inserting fighter \n'); //maybe start console logging error here again
-    return Fighter.findOne({where: {name: obj.name}}).then((fighterData)=> {
+    return Fighter.findOne({ where: { name: obj.name } }).then((fighterData) => {
       return associateFighter(fighterData, sessId)
     })
   })
 }
 
+const insertBoxer = function (obj, sessId) {
+  return Boxer.create(obj, { returning: true }).then((fighterData) => {
+    //console.log('inserted a fighter \n', fighterData);
+    return User.findOne({
+      where: {
+        id: sessId
+      }
+    }).then((userData) => {
+      //console.log('fighterData in findOne promise \n', fighterData)
+      //return fighterData.setUser(userData)
+      return userData.addBoxer(fighterData)
+    }).then((success) => {
+      console.log('user boxer join success')
+      return
+    }).catch((err) => {
+      console.log('user boxer join error \n', err)
+      return
+    })
+  }).catch((err) => {
+    console.log('error inserting boxer \n'); //maybe start console logging error here again
+    return Fighter.findOne({ where: { name: obj.name } }).then((fighterData) => {
+      return associateBoxer(fighterData, sessId)
+    })
+  })
+}
+
 const associateFighter = function (fighterData, sessId) {
-  return User.findOne({where: {id: sessId}}).then((userData)=> {
+  return User.findOne({ where: { id: sessId } }).then((userData) => {
     return userData.addFighter(fighterData)
-  }).then(()=> {
+  }).then(() => {
     console.log('associateFighter: successfully associated fighter')
     return
-  }).catch((err)=> {
+  }).catch((err) => {
     console.log('associateFighter: error associating fighter \n', err)
+    return
+  })
+}
+
+const associateBoxer = function (fighterData, sessId) {
+  return User.findOne({ where: { id: sessId } }).then((userData) => {
+    return userData.addBoxer(fighterData)
+  }).then(() => {
+    console.log('associateBoxer: successfully associated fighter')
+    return
+  }).catch((err) => {
+    console.log('associateBoxer: error associating fighter \n', err)
     return
   })
 }
@@ -116,18 +183,25 @@ const associateFighter = function (fighterData, sessId) {
 //   })
 // }
 
-const getFighters = function(sessId) {
+const getFighters = function (sessId) {
   return User.findOne({
-    where: {id: sessId},
-    include: {
+    where: { id: sessId },
+    include: [{
       model: Fighter,
       through: {
         attributes: []
       }
-    }
-  }).then((data)=> {
-    return JSON.parse(JSON.stringify(data, null, 2)).Fighters
-  }).catch((err)=> {
+    },
+    {
+      model: Boxer,
+      through: {
+        attributes: []
+      }
+    }]
+  }).then((data) => {
+    //console.log(JSON.parse(JSON.stringify(data, null, 2)))
+    return [JSON.parse(JSON.stringify(data, null, 2)).Fighters, JSON.parse(JSON.stringify(data, null, 2)).Boxers]
+  }).catch((err) => {
     console.log('getFighters err \n', err)
   })
 }
@@ -140,6 +214,18 @@ const getSingleFighter = function (fighter) {
     }
   }).then((data) => {
     console.log('getSingleFighter data: \n', data)
+    return data
+  })
+}
+
+const getSingleBoxer = function (fighter) {
+  return Boxer.findOne({
+    where: {
+      name: fighter.name,
+      style: fighter.style
+    }
+  }).then((data) => {
+    console.log('getSingleBoxer data')
     return data
   })
 }
@@ -165,18 +251,34 @@ const getNameList = function () {
 //   })
 // }
 
-const removeFighter = function(name, sessId) {
+const removeFighter = function (name, sessId) {
   return User.findOne({
-    where: {id: sessId}
-  }).then((userData)=> {
-    return Fighter.findOne({where: {name: name}}).then((fighterData)=> {
+    where: { id: sessId }
+  }).then((userData) => {
+    return Fighter.findOne({ where: { name: name } }).then((fighterData) => {
       return userData.removeFighter(fighterData)
-    }).catch((err)=> {
+    }).catch((err) => {
       console.log('nested removeFighter err \n', err)
       return
     })
-  }).catch((err)=> {
+  }).catch((err) => {
     console.log('removeFighter err \n', err)
+    return
+  })
+}
+
+const removeBoxer = function (name, sessId) {
+  return User.findOne({
+    where: { id: sessId }
+  }).then((userData) => {
+    return Boxer.findOne({ where: { name: name } }).then((fighterData) => {
+      return userData.removeBoxer(fighterData)
+    }).catch((err) => {
+      console.log('nested removeBoxer err \n', err)
+      return
+    })
+  }).catch((err) => {
+    console.log('removeBoxer err \n', err)
     return
   })
 }
@@ -216,14 +318,18 @@ const loginGetUser = function (user) {
 
 module.exports = {
   insertFighter,
+  insertBoxer,
   getFighters,
   removeFighter,
+  removeBoxer,
   getNameList,
   insertUser,
   registerGetUser,
   loginGetUser,
   getSingleFighter,
-  associateFighter
+  getSingleBoxer,
+  associateFighter,
+  associateBoxer
 }
 
 // const insertFighter = function(obj) {

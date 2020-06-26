@@ -8,26 +8,16 @@ AWS.config.loadFromPath('./config.json');
 s3 = new AWS.S3({apiVersion: '2006-03-01'});
 
 // call S3 to retrieve upload file to specified bucket
-const s3Uploader = function(file) {
+const s3Uploader = function(url, name) {
   var uploadParams = {Bucket: 'fightwatchimages', Key: '', Body: ''};
 
-  // Configure the file stream and obtain the upload parameters
-  //var fs = require('fs');
-  // var fileStream = fs.createReadStream(file);
-  // fileStream.on('error', function(err) {
-  //   console.log('File Error', err);
-  // });
-
-  var fileStream = new FetchStream("https://www.sherdog.com/image_crop/200/300/_images/fighter/20150523042239_5D3_3889.JPG");
-
-  // fetch.on("data", function(chunk){
-  //   console.log('rectum sex \n', chunk);
-  // });
+  var fileStream = new FetchStream(url));
 
   uploadParams.Body = fileStream;
   var path = require('path');
-  //uploadParams.Key = path.basename(file);
-  uploadParams.Key = 'pleaseowrkpls.jpg'
+
+  uploadParams.Key = transponseImgName(name)
+
   // call S3 to retrieve upload file to specified bucket
   s3.upload (uploadParams, function (err, data) {
     if (err) {

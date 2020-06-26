@@ -16,7 +16,7 @@ const transposeName = function (name) { //helper function to tranpose names so t
 }
 
 const transposeImgName = function (name) { //helper function to tranpose names so they are google searchable
-  var transposed = name.replace(/ /g, '-');
+  var transposed = name.replace(/ /g, '-') + '.jpg';
   return transposed;
 }
 

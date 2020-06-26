@@ -5,7 +5,7 @@ const request = require('request');
 var sherdog = require('sherdog');
 var cookieParser = require('cookie-parser');
 var expressSession = require('express-session');
-const { insertFighter, getFighters, removeFighter, getNameList, insertUser, registerGetUser, loginGetUser, getSingleFighter, associateFighter } = require('../database-mysql/index.js')
+const { insertFighter, insertBoxer, getFighters, removeFighter, removeBoxer, getNameList, insertUser, registerGetUser, loginGetUser, getSingleFighter, getSingleBoxer, associateFighter, associateBoxer } = require('../database-mysql/index.js')
 const path = require('path')
 const {downloadImg, transposeName, capitalizeWords, transposeImgName} = require('./utils.js')
 const {s3Uploader} = require('./s3Upload.js')
@@ -93,12 +93,12 @@ app.get('/search', function (req, res) { //search sherdog for mma fighter
       request(`https://www.googleapis.com/customsearch/v1?key=AIzaSyAgLmwFLMuqANxoLxNVrILaslMuNUy9DF8&cx=007218699401475344710:xatgqbhqag0&q=${string}`, function (err, response, body) {
         var url = JSON.parse(body).items[0].link;
         sherdog.getFighter(url, function (data) {
-          downloadImg(data.image, `./react-client/dist/images/${transposeImgName(data.name)}.jpg`, ()=> {
-            console.log('downloaded image')
-          }) //maybe fix this async between downloadImg and insertFighter
-          insertFighter(data, req.session.userId).then((data) => {
-            res.end()
-          });
+          s3Uploader(data.image, data.name, ()=> {
+            data.image = 'https://fightwatchimages.s3.us-east-2.amazonaws.com/' + transposeImgName(data.name)
+            insertFighter(data, req.session.userId).then((data) => {
+              res.end()
+            });
+          })
         })
       })
     } else {
@@ -108,9 +108,33 @@ app.get('/search', function (req, res) { //search sherdog for mma fighter
       });
     }
   })
-  //var string = transposeName(req.query.fighter);
-
 });
+
+app.get('/boxer', function (req, res) { //search boxrec for boxer
+  let string = capitalizeWords(req.query.fighter.toLowerCase());
+  getSingleBoxer({name: string, style: 'boxing'}).then((data)=> {
+    if (data === null) {
+      console.log('boxer not found in database')
+      var string = transposeName(req.query.fighter);
+      request(`https://www.googleapis.com/customsearch/v1?key=AIzaSyAgLmwFLMuqANxoLxNVrILaslMuNUy9DF8&cx=007218699401475344710:d2e5d7wqupx&q=${string}`, function (err, response, body) {
+        var url = JSON.parse(body).items[0].link
+        sherdog.getBoxer(url, function (data) {
+          s3Uploader(data.image, data.name, ()=> {
+            data.image = 'https://fightwatchimages.s3.us-east-2.amazonaws.com/' + transposeImgName(data.name)
+            insertBoxer(data, req.session.userId).then((data) => {
+              res.end()
+            });
+          })
+        })
+      })
+    } else {
+      console.log('fighter found in database')
+      associateFighter(data, req.session.userId).then(()=> {
+        res.end()
+      })
+    }
+  })
+})
 
 app.post('/login', (req, res) => {
   const userData = { username: req.body.username, password: req.body.password }
@@ -184,27 +208,9 @@ app.get('/load', function (req, res) {
   })
 })
 
-app.get('/boxer', function (req, res) { //search boxrec for boxer
-  let string = capitalizeWords(req.query.fighter.toLowerCase());
-  getSingleFighter({name: string, style: 'boxing'}).then((data)=> {
-    if (data === null) {
-      console.log('boxer not found in database')
-      var string = transposeName(req.query.fighter);
-      request(`https://www.googleapis.com/customsearch/v1?key=AIzaSyAgLmwFLMuqANxoLxNVrILaslMuNUy9DF8&cx=007218699401475344710:d2e5d7wqupx&q=${string}`, function (err, response, body) {
-        var url = JSON.parse(body).items[0].link
-        sherdog.getBoxer(url, function (guy) {
-          insertFighter(guy, req.session.userId).then((data) => {
-            console.log(guy)
-            res.send(guy)
-          })
-        })
-      })
-    } else {
-      console.log('fighter found in database')
-      associateFighter(data, req.session.userId).then(()=> {
-        res.end()
-      })
-    }
+app.delete('/boxer', function (req, res) { //delete fighter from database
+  removeBoxer(req.body.fighter, req.session.userId).then(() => {
+    res.end();
   })
 })
 
