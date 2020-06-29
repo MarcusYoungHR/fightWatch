@@ -28,6 +28,18 @@ class App extends React.Component {
     $.ajax({
       url: '/load',
       success: (data) => {
+        data[0] = data[0].sort((a, b)=> {
+          if (a.next_fight === 'TBA') {
+            return 1
+          }
+          if (b.next_fight === 'TBA') {
+            return -1
+          }
+          return new Date(a.next_fight) - new Date(b.next_fight)
+        })
+        data[1] = data[1].sort((a, b)=> {
+          return new Date(a.next_fight) - new Date(b.next_fight)
+        })
         console.log('component did mount data: \n', data)
 
         this.setState({
@@ -58,6 +70,7 @@ class App extends React.Component {
       },
       error: (err) => {
         console.log('error in search get request: \n', err)
+        alert("couldn't find mma fighter")
       }
     })
   }
@@ -73,6 +86,7 @@ class App extends React.Component {
       },
       error: (err) => {
         console.log('error in search get request: \n', err)
+        alert("couldn't find boxer")
       }
     })
   }

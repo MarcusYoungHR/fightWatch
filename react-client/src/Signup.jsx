@@ -60,7 +60,7 @@ class Signup extends React.Component {
             }}>
             </input>
 
-            <input className='loginInput' type='text' placeholder='password' id='password' name='password' onChange={(event) => {
+            <input className='loginInput' type='password' placeholder='password' id='password' name='password' onChange={(event) => {
               this.changeHandler('password', event.target.value)
             }}>
             </input>

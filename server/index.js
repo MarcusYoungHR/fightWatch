@@ -14,11 +14,24 @@ const mmaUrl = 'https://www.googleapis.com/customsearch/v1?key=AIzaSyAgLmwFLMuqA
 
 const boxingUrl = 'https://www.googleapis.com/customsearch/v1?key=AIzaSyAgLmwFLMuqANxoLxNVrILaslMuNUy9DF8&cx=007218699401475344710:d2e5d7wqupx&q='
 
-const scrapeWeb = function (customSearch, name, req, res, getMethod, insertMethod) {
+const scrapeWeb = function (customSearch, name, req, res, getMethod, insertMethod, singleSearch, associate) {
   request(customSearch + name, function (err, response, body) {
     let parsedBody = JSON.parse(body)
     if (!parsedBody.items) {
-      scrapeWeb(customSearch, transposeName(parsedBody.spelling.correctedQuery), req, res, getMethod, insertMethod)
+      if (parsedBody.spelling) {
+        singleSearch({name: parsedBody.spelling.correctedQuery}).then((data)=> {
+          if (data === null) {
+            scrapeWeb(customSearch, transposeName(parsedBody.spelling.correctedQuery), req, res, getMethod, insertMethod, singleSearch)
+          } else {
+            console.log('spelling error fighter found in database')
+            associate(data, req.session.userId).then(()=> {
+              res.sendStatus(200)
+            })
+          }
+        })
+      } else {
+        res.sendStatus(400)
+      }
     } else {
       let url = JSON.parse(body).items[0].link;
       console.log('made it this far \n', url)
@@ -26,12 +39,12 @@ const scrapeWeb = function (customSearch, name, req, res, getMethod, insertMetho
         s3Uploader(data.image, data.name, () => {
           data.image = 'https://fightwatchimages.s3.us-east-2.amazonaws.com/' + transposeImgName(data.name)
           insertMethod(data, req.session.userId).then((data) => {
-            res.end()
+            res.sendStatus(200)
           });
         }, () => {
           res.sendStatus(400)
         })
-      })
+      }, ()=> {res.sendStatus(400)})
     }
   })
 }
@@ -125,7 +138,7 @@ app.get('/search', function (req, res) { //search sherdog for mma fighter
     if (data === null) {
       string = transposeName(string)
       console.log('fighter not found in database')
-      scrapeWeb(mmaUrl, string, req, res, SDGetFighter, insertFighter)
+      scrapeWeb(mmaUrl, string, req, res, SDGetFighter, insertFighter, getSingleFighter, associateFighter)
     } else {
       console.log('fighter found in database')
       associateFighter(data, req.session.userId).then(() => {
@@ -141,7 +154,7 @@ app.get('/boxer', function (req, res) { //search boxrec for boxer
     if (data === null) {
       console.log('boxer not found in database')
       var string = transposeName(req.query.fighter);
-      scrapeWeb(boxingUrl, string, req, res, SDGetBoxer, insertBoxer)
+      scrapeWeb(boxingUrl, string, req, res, SDGetBoxer, insertBoxer, getSingleBoxer, associateBoxer)
     } else {
       console.log('fighter found in database')
       associateFighter(data, req.session.userId).then(() => {

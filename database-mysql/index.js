@@ -201,8 +201,7 @@ const getFighters = function (sessId) {
 const getSingleFighter = function (fighter) {
   return Fighter.findOne({
     where: {
-      name: fighter.name,
-      style: fighter.style
+      name: fighter.name
     }
   }).then((data) => {
     console.log('getSingleFighter data: \n', data)
@@ -213,8 +212,7 @@ const getSingleFighter = function (fighter) {
 const getSingleBoxer = function (fighter) {
   return Boxer.findOne({
     where: {
-      name: fighter.name,
-      style: fighter.style
+      name: fighter.name
     }
   }).then((data) => {
     console.log('getSingleBoxer data')
