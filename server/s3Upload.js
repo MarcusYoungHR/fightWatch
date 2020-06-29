@@ -10,10 +10,15 @@ s3 = new AWS.S3({apiVersion: '2006-03-01'});
 
 // call S3 to retrieve upload file to specified bucket
 
-const s3Uploader = function(url, name, callback) {
+const s3Uploader = function(url, name, callback, errorCB) {
   var uploadParams = {Bucket: 'fightwatchimages', Key: '', Body: '', ACL: 'public-read'};
 
   var fileStream = new FetchStream(url);
+
+  fileStream.on('error', (err)=> {
+    console.log('error in s3upload \n', err)
+    errorCB()
+  })
 
   uploadParams.Body = fileStream;
   var path = require('path');
@@ -25,7 +30,7 @@ const s3Uploader = function(url, name, callback) {
     if (err) {
       console.log("Error", err);
     } if (data) {
-      console.log("Upload Success", data.Location);
+      console.log("Image Upload Success", data.Location);
       callback()
     }
   });

@@ -10,15 +10,35 @@ class Signup extends React.Component {
     super(props);
     this.state = {
       username: '',
-      password: '',
-      method: '/signup'
+      password: ''
     }
     this.changeHandler = this.changeHandler.bind(this)
+    this.submitHandler = this.submitHandler.bind(this)
   }
 
   changeHandler(entry, val) {
     this.setState({
       [entry]: val
+    })
+  }
+
+  submitHandler(endpoint) {
+    $.ajax({
+      url: endpoint,
+      method: 'POST',
+      data: this.state,
+      success: (data)=> {
+        console.log('it woiked')
+        window.location.href = '/home'
+      },
+      error: (err)=> {
+        console.log('oh no \n', err.status)
+        if (err.status === 403) {
+          alert('incorrect username or password')
+        } else if (err.status === 400) {
+          alert('user already exists')
+        }
+      }
     })
   }
 
@@ -33,7 +53,7 @@ class Signup extends React.Component {
 
           <h1 className='signUpHeader'>Login</h1>
 
-          <form action='/login' method='post'>
+          <form>
 
             <input className='loginInput' type='text' placeholder='user name' id='username' name='username' onChange={(event) => {
               this.changeHandler('username', event.target.value)
@@ -45,9 +65,15 @@ class Signup extends React.Component {
             }}>
             </input>
 
-            <button className="loginBtn btn btn-dark"> Login </button>
+            <button className="loginBtn btn btn-dark" onClick = {(event)=> {
+              event.preventDefault()
+              this.submitHandler('/login')
+            }}> Login </button>
 
-            <button className="btn btn-dark registerBtn" formAction='/register' formMethod='post'> Register </button>
+            <button className="btn btn-dark registerBtn" onClick ={(event)=> {
+              event.preventDefault()
+              this.submitHandler('/register')
+            }}> Register </button>
 
           </form>
           <p className='loginText'>Don't have an account? Registering is easy! Simply choose a name and password and hit register. No email verification or password complexity required.</p>

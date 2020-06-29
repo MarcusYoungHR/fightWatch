@@ -35,6 +35,9 @@ var model = {
   },
   style: {
     type: Sequelize.STRING
+  },
+  url: {
+    type: Sequelize.STRING
   }
 }
 
@@ -60,6 +63,9 @@ var boxers = {
   },
   style: {
     type: Sequelize.STRING
+  },
+  url: {
+    type: Sequelize.STRING
   }
 }
 
@@ -81,11 +87,6 @@ var users = {
 const Boxer = sequelize.define('Boxers', boxers)
 const Fighter = sequelize.define('Fighters', model)
 const User = sequelize.define('Users', users);
-
-// Fighter.belongsTo(User)
-// //User.belongsTo(Fighter);
-// //Fighter.hasMany(User)
-// User.hasMany(Fighter);
 
 Fighter.belongsToMany(User, { through: 'UserFighter' })
 User.belongsToMany(Fighter, { through: 'UserFighter' })
@@ -174,15 +175,6 @@ const associateBoxer = function (fighterData, sessId) {
   })
 }
 
-// const getFighters = function () {
-//   return Fighter.findAll().then(function (data) {
-//     console.log('retreived fighter list')
-//     return data;
-//   }).catch(function (err) {
-//     console.log('failed to retrieve list: \n', err);
-//   })
-// }
-
 const getFighters = function (sessId) {
   return User.findOne({
     where: { id: sessId },
@@ -231,25 +223,24 @@ const getSingleBoxer = function (fighter) {
 }
 
 const getNameList = function () {
-  return Fighter.findAll({ attributes: ['name', 'style'], raw: true }).then(function (data) {
+  return Fighter.findAll({ attributes: ['name', 'url'], raw: true }).then(function (data) {
     console.log('retreived fighter names \n', data)
     return data
   }).catch(function (err) {
     console.log('failed to retrieve fighter names \n', err)
+    return
   })
 }
 
-// const removeFighter = function (name) {
-//   return Fighter.destroy({
-//     where: {
-//       name: name
-//     }
-//   }).then(() => {
-//     console.log('fighter removed')
-//   }).catch((err) => {
-//     console.log('failed to remove fighter: \n', err)
-//   })
-// }
+const getBoxerList = function () {
+  return Boxer.findAll({ attributes: ['name', 'url'], raw: true }).then(function (data) {
+    console.log('retreived fighter names \n', data)
+    return data
+  }).catch(function (err) {
+    console.log('failed to retrieve fighter names \n', err)
+    return
+  })
+}
 
 const removeFighter = function (name, sessId) {
   return User.findOne({
@@ -316,6 +307,16 @@ const loginGetUser = function (user) {
   })
 }
 
+const updateFighter = function(fighter) {
+  const {name, next_fight, next_opponent} = fighter
+  return Fighter.update({next_fight: next_fight, next_opponent: next_opponent}, {where: {name: name}})
+}
+
+const updateBoxer = function(boxer) {
+  const {name, next_fight, next_opponent} = boxer
+  return Boxer.update({next_fight: next_fight, next_opponent: next_opponent}, {where: {name: name}})
+}
+
 module.exports = {
   insertFighter,
   insertBoxer,
@@ -329,25 +330,9 @@ module.exports = {
   getSingleFighter,
   getSingleBoxer,
   associateFighter,
-  associateBoxer
+  associateBoxer,
+  updateBoxer,
+  updateFighter,
+  getBoxerList
 }
 
-// const insertFighter = function(obj) {
-//   return Fighters.upsert(obj, {returning: true}).then(function(data) {
-//     console.log('inserted a fighter \n', data)
-//     return Users.findOne({
-//       where: {
-//         id: 1
-//       }
-//     }).then((user) => {
-//       //console.log('please work data \n', data, '\nplease work user \n', user)
-//       return user.setFighters()
-//     }).then((something) => {
-//       console.log('associated fighter with user \n', data)
-//     }).catch((err) => {
-//       console.log('error in associating \n', err);
-//     })
-//   }).catch(function(err) {
-//     console.log('failed to insert: \n', err);
-//   })
-// }

@@ -2,13 +2,39 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var Sequelize = require('sequelize')
 const request = require('request');
-var sherdog = require('sherdog');
+const { SDGetBoxer, SDGetFighter } = require('./scraper.js');
 var cookieParser = require('cookie-parser');
 var expressSession = require('express-session');
-const { insertFighter, insertBoxer, getFighters, removeFighter, removeBoxer, getNameList, insertUser, registerGetUser, loginGetUser, getSingleFighter, getSingleBoxer, associateFighter, associateBoxer } = require('../database-mysql/index.js')
+const { insertFighter, insertBoxer, getFighters, removeFighter, removeBoxer, getNameList, insertUser, registerGetUser, loginGetUser, getSingleFighter, getSingleBoxer, associateFighter, associateBoxer, updateFighter, updateBoxer, getBoxerList } = require('../database-mysql/index.js')
 const path = require('path')
-const {downloadImg, transposeName, capitalizeWords, transposeImgName} = require('./utils.js')
-const {s3Uploader} = require('./s3Upload.js')
+const { downloadImg, transposeName, capitalizeWords, transposeImgName } = require('./utils.js')
+const { s3Uploader } = require('./s3Upload.js')
+
+const mmaUrl = 'https://www.googleapis.com/customsearch/v1?key=AIzaSyAgLmwFLMuqANxoLxNVrILaslMuNUy9DF8&cx=007218699401475344710:xatgqbhqag0&q='
+
+const boxingUrl = 'https://www.googleapis.com/customsearch/v1?key=AIzaSyAgLmwFLMuqANxoLxNVrILaslMuNUy9DF8&cx=007218699401475344710:d2e5d7wqupx&q='
+
+const scrapeWeb = function (customSearch, name, req, res, getMethod, insertMethod) {
+  request(customSearch + name, function (err, response, body) {
+    let parsedBody = JSON.parse(body)
+    if (!parsedBody.items) {
+      scrapeWeb(customSearch, transposeName(parsedBody.spelling.correctedQuery), req, res, getMethod, insertMethod)
+    } else {
+      let url = JSON.parse(body).items[0].link;
+      console.log('made it this far \n', url)
+      getMethod(url, function (data) {
+        s3Uploader(data.image, data.name, () => {
+          data.image = 'https://fightwatchimages.s3.us-east-2.amazonaws.com/' + transposeImgName(data.name)
+          insertMethod(data, req.session.userId).then((data) => {
+            res.end()
+          });
+        }, () => {
+          res.sendStatus(400)
+        })
+      })
+    }
+  })
+}
 
 var SequelizeStore = require('connect-session-sequelize')(expressSession.Store);
 
@@ -54,7 +80,18 @@ const redirectLogin = (req, res, next) => { //custom middleware i define
     res.redirect('/') //redirects to the login page if the user is not logged in
   } else { //if the user is logged in
     console.log('redirectLogin: user is logged in')
-    next() //move onto next middleware
+    myStore.get(req.sessionID, (err)=> {
+      if (err) {
+        console.log('bad session hash')
+        res.session.destroy()
+        res.clearCookie('fightWatchId')
+        res.redirect('/')
+      } else {
+        console.log('good session hash')
+        next()
+      }
+    })
+//move onto next middleware
   }
 }
 
@@ -81,8 +118,6 @@ app.get('/', redirectHome, (req, res) => {
   res.sendFile(path.resolve('react-client/dist/login.html'))
 })
 
-
-
 app.get('/search', function (req, res) { //search sherdog for mma fighter
   let string = capitalizeWords(req.query.fighter.toLowerCase());
   //console.log(string)
@@ -90,20 +125,10 @@ app.get('/search', function (req, res) { //search sherdog for mma fighter
     if (data === null) {
       string = transposeName(string)
       console.log('fighter not found in database')
-      request(`https://www.googleapis.com/customsearch/v1?key=AIzaSyAgLmwFLMuqANxoLxNVrILaslMuNUy9DF8&cx=007218699401475344710:xatgqbhqag0&q=${string}`, function (err, response, body) {
-        var url = JSON.parse(body).items[0].link;
-        sherdog.getFighter(url, function (data) {
-          s3Uploader(data.image, data.name, ()=> {
-            data.image = 'https://fightwatchimages.s3.us-east-2.amazonaws.com/' + transposeImgName(data.name)
-            insertFighter(data, req.session.userId).then((data) => {
-              res.end()
-            });
-          })
-        })
-      })
+      scrapeWeb(mmaUrl, string, req, res, SDGetFighter, insertFighter)
     } else {
       console.log('fighter found in database')
-      associateFighter(data, req.session.userId).then(()=> {
+      associateFighter(data, req.session.userId).then(() => {
         res.end()
       });
     }
@@ -112,24 +137,14 @@ app.get('/search', function (req, res) { //search sherdog for mma fighter
 
 app.get('/boxer', function (req, res) { //search boxrec for boxer
   let string = capitalizeWords(req.query.fighter.toLowerCase());
-  getSingleBoxer({name: string, style: 'boxing'}).then((data)=> {
+  getSingleBoxer({ name: string, style: 'boxing' }).then((data) => {
     if (data === null) {
       console.log('boxer not found in database')
       var string = transposeName(req.query.fighter);
-      request(`https://www.googleapis.com/customsearch/v1?key=AIzaSyAgLmwFLMuqANxoLxNVrILaslMuNUy9DF8&cx=007218699401475344710:d2e5d7wqupx&q=${string}`, function (err, response, body) {
-        var url = JSON.parse(body).items[0].link
-        sherdog.getBoxer(url, function (data) {
-          s3Uploader(data.image, data.name, ()=> {
-            data.image = 'https://fightwatchimages.s3.us-east-2.amazonaws.com/' + transposeImgName(data.name)
-            insertBoxer(data, req.session.userId).then((data) => {
-              res.end()
-            });
-          })
-        })
-      })
+      scrapeWeb(boxingUrl, string, req, res, SDGetBoxer, insertBoxer)
     } else {
       console.log('fighter found in database')
-      associateFighter(data, req.session.userId).then(()=> {
+      associateFighter(data, req.session.userId).then(() => {
         res.end()
       })
     }
@@ -143,11 +158,13 @@ app.post('/login', (req, res) => {
     //console.log('express login data \n', data);
     if (data === null) {
       console.log('incorrect login info')
-      res.redirect('/')
+      //res.redirect('/')
+      res.status(403).send('incorrect login')
     } else {
       req.session.userId = data.id
       req.session.save(() => {
-        res.redirect('/home')
+        //res.redirect('/home')
+        res.status(200).send('good job')
       })
     }
   })
@@ -172,11 +189,12 @@ app.post('/register', (req, res) => {
       insertUser(userData).then((userId) => {
         req.session.userId = userId;
         req.session.save(() => {
-          res.redirect('/home')
+          //res.redirect('/home')
+          res.status(200).send('registration successful')
         })
       })
     } else {
-      res.redirect('/')
+      res.status(400).send('user already exists')
     }
   })
 })
@@ -193,14 +211,6 @@ app.get('/home', redirectLogin, (req, res) => {
   res.sendFile((path.resolve('react-client/dist/home.html')))
 })
 
-app.post('/signup', function (req, res) {
-  console.log('sessionId \n', req.session)
-  insertUser(req.body.user).then(() => {
-    console.log('request cookie \n', req.cookie)
-    res.end()
-  })
-  res.end()
-})
 
 app.get('/load', function (req, res) {
   getFighters(req.session.userId).then(function (data) {
@@ -222,38 +232,74 @@ app.delete('/search', function (req, res) { //delete fighter from database
 //            ms     s    m    h
 let dayInMS = 1000 * 60 * 60 * 24
 
-const refreshList = function () { //refresh all fighters
-  getNameList().then((data) => {
-    for (let i = 0; i < data.length; i++) {
-      if (data[i].style === 'boxing') {
-        refreshBoxer(data[i].name)
-      } else if (data[i].style === 'mma') {
-        refreshFighter(data[i].name)
-      }
-    }
-    setTimeout(refreshList, dayInMS)
-  })
+// const refreshList = function () { //refresh all fighters
+//   getNameList().then((data) => {
+//     for (let i = 0; i < data.length; i++) {
+//       refreshFighter(data[i])
+//     }
+//   }).then(()=> {
+//     getBoxerList().then((boxers)=> {
+//       for (let i = 0; i < boxers.length; i ++) {
+//         refreshBoxer(boxers[i])
+//       }
+//     }).then(()=> {
+//       setTimeout(refreshList, dayInMS)
+//     })
+//   })
+// }
+
+const refreshBoxer = function (array, index) {
+  console.log('the index is: ', index)
+  console.log(array[index].name)
+  if (index >= array.length) {
+    return
+  } else {
+    let { url } = array[index]
+    SDGetBoxer(url, (data) => {
+      data.next_fight = 'weiner'
+      updateBoxer(data).then(() => {
+        refreshBoxer(array, index + 1)
+      })
+    })
+  }
 }
 
-const refreshBoxer = function (boxer) { //helper function to refresh boxers
-  var string = transposeName(boxer);
-  request(`https://www.googleapis.com/customsearch/v1?key=AIzaSyAgLmwFLMuqANxoLxNVrILaslMuNUy9DF8&cx=007218699401475344710:d2e5d7wqupx&q=${string}`, function (err, response, body) {
-    var url = JSON.parse(body).items[0].link
-    sherdog.getBoxer(url, function (guy) {
-      insertFighter(guy)
-    })
+// const refreshFighter = function (fighter) { //helper function to refresh mma fighters
+//   var string = transposeName(fighter);
+//   request(mmaUrl + string, function (err, response, body) {
+//     var url = JSON.parse(body).items[0].link;
+//     sherdog.getFighter(url, function (data) {
+//       insertFighter(data)
+//     })
+//   })
+// }
+
+const refreshList = function () {
+  getNameList().then((data)=> {
+    refreshFighter(data, 0)
   })
+  setTimeout(refreshList, dayInMS)
+  // getBoxerList().then((data)=> {
+  //   refreshBoxer(data, 0)
+  // })
 }
 
-const refreshFighter = function (fighter) { //helper function to refresh mma fighters
-  var string = transposeName(fighter);
-  request(`https://www.googleapis.com/customsearch/v1?key=AIzaSyAgLmwFLMuqANxoLxNVrILaslMuNUy9DF8&cx=007218699401475344710:xatgqbhqag0&q=${string}`, function (err, response, body) {
-    var url = JSON.parse(body).items[0].link;
-    sherdog.getFighter(url, function (data) {
-      insertFighter(data)
+const refreshFighter = function (array, index) {
+  if (index >= array.length) {
+    return
+  } else {
+    let { url } = array[index]
+    console.log(array[index].name)
+    SDGetFighter(url, (data) => {
+      updateFighter(data).then(() => {
+        refreshFighter(array, index + 1)
+      })
     })
-  })
+  }
 }
+//
+
 
 //refreshList()
 //^^^^ uncomment when server is deployed
+
