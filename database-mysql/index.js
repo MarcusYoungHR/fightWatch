@@ -10,7 +10,7 @@ const sequelize = new Sequelize('fighterDB', 'Marcus', '4815162342Aa!', {
 sequelize.authenticate().then(() => {
   console.log('connected to mysql');
 }).catch((err) => {
-  console.log('ah fuck', err);
+  console.log('error authenticating connection \n', err);
 })
 
 var model = {
@@ -313,6 +313,10 @@ const updateFighter = function(fighter) {
 const updateBoxer = function(boxer) {
   const {name, next_fight, next_opponent} = boxer
   return Boxer.update({next_fight: next_fight, next_opponent: next_opponent}, {where: {name: name}})
+}
+
+const getUserList = function() {
+  
 }
 
 module.exports = {

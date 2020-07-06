@@ -226,9 +226,15 @@ app.get('/home', redirectLogin, (req, res) => {
 
 
 app.get('/load', function (req, res) {
+  //console.log(req.session)
   getFighters(req.session.userId).then(function (data) {
+    data.push(req.session.userId)
     res.send(data);
   })
+})
+
+app.get('/userCount', function(req, res) {
+  
 })
 
 app.delete('/boxer', function (req, res) { //delete fighter from database
