@@ -316,8 +316,13 @@ const updateBoxer = function(boxer) {
 }
 
 const getUserList = function() {
-  
+  return User.findAll({raw: true}).then((data)=> {
+    console.log('getUserList number of users \n', data.length)
+    return data.length
+  })
 }
+
+//getUserList()
 
 module.exports = {
   insertFighter,
@@ -335,6 +340,7 @@ module.exports = {
   associateBoxer,
   updateBoxer,
   updateFighter,
-  getBoxerList
+  getBoxerList,
+  getUserList
 }
 

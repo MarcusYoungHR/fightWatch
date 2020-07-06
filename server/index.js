@@ -5,7 +5,7 @@ const request = require('request');
 const { SDGetBoxer, SDGetFighter } = require('./scraper.js');
 var cookieParser = require('cookie-parser');
 var expressSession = require('express-session');
-const { insertFighter, insertBoxer, getFighters, removeFighter, removeBoxer, getNameList, insertUser, registerGetUser, loginGetUser, getSingleFighter, getSingleBoxer, associateFighter, associateBoxer, updateFighter, updateBoxer, getBoxerList } = require('../database-mysql/index.js')
+const { insertFighter, insertBoxer, getFighters, removeFighter, removeBoxer, getNameList, insertUser, registerGetUser, loginGetUser, getSingleFighter, getSingleBoxer, associateFighter, associateBoxer, updateFighter, updateBoxer, getBoxerList, getUserList } = require('../database-mysql/index.js')
 const path = require('path')
 const { downloadImg, transposeName, capitalizeWords, transposeImgName } = require('./utils.js')
 const { s3Uploader } = require('./s3Upload.js')
@@ -234,7 +234,10 @@ app.get('/load', function (req, res) {
 })
 
 app.get('/userCount', function(req, res) {
-  
+  getUserList().then((data)=> {
+    console.log('did this work?')
+    res.send({stupid: data})
+  })
 })
 
 app.delete('/boxer', function (req, res) { //delete fighter from database

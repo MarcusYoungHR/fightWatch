@@ -16,6 +16,7 @@ class App extends React.Component {
       boxers: [],
       fighter: '',
       test: 0,
+      users: 0
     }
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
@@ -24,6 +25,7 @@ class App extends React.Component {
     this.onBoxerSubmit = this.onBoxerSubmit.bind(this);
     this.removeBoxer = this.removeBoxer.bind(this)
     this.closeModal = this.closeModal.bind(this)
+    this.getUserCount = this.getUserCount.bind(this)
   }
 
   componentDidMount() {
@@ -134,21 +136,34 @@ class App extends React.Component {
     })
   }
 
+  getUserCount() {
+    $.ajax({
+      url: '/userCount',
+      success: (data) => {
+        console.log('dkjsdakufba')
+        this.setState({
+          users: data.stupid
+        })
+      }
+    })
+  }
+
   render() {
 
     return (
       <div>
-        <ReactModal isOpen={this.state.test === 2} style={{
+        <ReactModal isOpen={this.state.test === 2} onAfterOpen={this.getUserCount} style={{
           overlay: { zIndex: '20' },
-          content: { backgroundColor: 'rgba(204, 204, 204, 0.8)'}
+          content: { backgroundColor: 'rgba(204, 204, 204, 0.8)' }
         }}>
-          <button className='btn btn-dark' onClick={() => {
-            this.closeModal()
-          }}>X</button>
+          <span>
+            <button className='btn btn-dark' onClick={() => {
+              this.closeModal()
+            }}>X</button> <p style={{float: 'right', fontSize: '1.5em'}}>There are currently <strong>{this.state.users}</strong> users signed up!</p>
+          </span>
           <p>
             <strong>Introduction</strong><br></br>
-            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Hi there, Thank you for visiting my website! This modal only pops up for the recruiter account and gives a brief overview
-            of how everything works. Don't feel like reading all this? Close the modal and try my site out! Search a fighter's name to see things work, I've already loaded a few of my favorites in for you. A more in depth description along with the repo itself are available upon clicking the "more details" button. I included this for recruiters because as my app may seem simple from the outside, there is quite a lot going on behind the scenes. <br></br>
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Hi there, Thank you for visiting my website! This modal only pops up for the recruiter account and gives a brief overview of how everything works. Don't feel like reading all this? Close the modal and try my site out! Search a fighter's name to see things work, I've already loaded a few of my favorites in for you. I included this for recruiters because as my app may seem simple from the outside, there is quite a lot going on behind the scenes. <br></br>
             <strong>What does this app do?</strong><br></br>
             &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Fight Watch is for keeping track of your favorite fighters, it will tell you when the date of their next fight is and who it is against. Originally I made this for myself as I could not keep track of every athlete I wanted to follow and missed some cruicial fights and then I fell in love with the project. <br></br>
             <strong>What technologies are used?</strong> <br></br>

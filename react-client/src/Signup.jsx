@@ -68,7 +68,7 @@ class Signup extends React.Component {
             <button className="loginBtn btn btn-dark" onClick = {(event)=> {
               event.preventDefault()
               this.submitHandler('/login')
-            }}> Login </button>
+            }}> &nbsp;&nbsp;Login&nbsp;</button>
 
             <button className="btn btn-dark registerBtn" onClick ={(event)=> {
               event.preventDefault()
