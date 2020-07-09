@@ -5,10 +5,12 @@ const request = require('request');
 const { SDGetBoxer, SDGetFighter } = require('./scraper.js');
 var cookieParser = require('cookie-parser');
 var expressSession = require('express-session');
-const { insertFighter, insertBoxer, getFighters, removeFighter, removeBoxer, getNameList, insertUser, registerGetUser, loginGetUser, getSingleFighter, getSingleBoxer, associateFighter, associateBoxer, updateFighter, updateBoxer, getBoxerList, getUserList } = require('../database-mysql/index.js')
+const { insertFighter, insertBoxer, getFighters, removeFighter, removeBoxer, getNameList, insertUser, getUser, loginGetUser, getSingleFighter, getSingleBoxer, associateFighter, associateBoxer, updateFighter, updateBoxer, getBoxerList, getUserList } = require('../database-mysql/index.js')
 const path = require('path')
 const { downloadImg, transposeName, capitalizeWords, transposeImgName } = require('./utils.js')
 const { s3Uploader } = require('./s3Upload.js')
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 const mmaUrl = 'https://www.googleapis.com/customsearch/v1?key=AIzaSyAgLmwFLMuqANxoLxNVrILaslMuNUy9DF8&cx=007218699401475344710:xatgqbhqag0&q='
 
@@ -19,12 +21,12 @@ const scrapeWeb = function (customSearch, name, req, res, getMethod, insertMetho
     let parsedBody = JSON.parse(body)
     if (!parsedBody.items) {
       if (parsedBody.spelling) {
-        singleSearch({name: parsedBody.spelling.correctedQuery}).then((data)=> {
+        singleSearch({ name: parsedBody.spelling.correctedQuery }).then((data) => {
           if (data === null) {
             scrapeWeb(customSearch, transposeName(parsedBody.spelling.correctedQuery), req, res, getMethod, insertMethod, singleSearch)
           } else {
             console.log('spelling error fighter found in database')
-            associate(data, req.session.userId).then(()=> {
+            associate(data, req.session.userId).then(() => {
               res.sendStatus(200)
             })
           }
@@ -44,7 +46,7 @@ const scrapeWeb = function (customSearch, name, req, res, getMethod, insertMetho
         }, () => {
           res.sendStatus(400)
         })
-      }, ()=> {res.sendStatus(400)})
+      }, () => { res.sendStatus(400) })
     }
   })
 }
@@ -93,7 +95,7 @@ const redirectLogin = (req, res, next) => { //custom middleware i define
     res.redirect('/') //redirects to the login page if the user is not logged in
   } else { //if the user is logged in
     console.log('redirectLogin: user is logged in')
-    myStore.get(req.sessionID, (err)=> {
+    myStore.get(req.sessionID, (err) => {
       if (err) {
         console.log('bad session hash')
         res.session.destroy()
@@ -104,7 +106,7 @@ const redirectLogin = (req, res, next) => { //custom middleware i define
         next()
       }
     })
-//move onto next middleware
+    //move onto next middleware
   }
 }
 
@@ -165,20 +167,28 @@ app.get('/boxer', function (req, res) { //search boxrec for boxer
 })
 
 app.post('/login', (req, res) => {
-  const userData = { username: req.body.username, password: req.body.password }
+  //const userData = { username: req.body.username, password: req.body.password }
+  const { username, password } = req.body
 
-  loginGetUser(userData).then((data) => {
+  getUser(username).then((data) => {
     //console.log('express login data \n', data);
     if (data === null) {
       console.log('incorrect login info')
       //res.redirect('/')
-      res.status(403).send('incorrect login')
+      res.status(403).send('username not found')
     } else {
-      req.session.userId = data.id
-      req.session.save(() => {
-        //res.redirect('/home')
-        res.status(200).send('good job')
-      })
+      bcrypt.compare(password, data.password, function (err, result) {
+        if (result == true) {
+          req.session.userId = data.id
+          req.session.save(() => {
+            //res.redirect('/home')
+            res.status(200).send('good job')
+          })
+        } else {
+          console.log('incorrect password')
+          res.status(403).send('incorrect password')
+        }
+      });
     }
   })
 })
@@ -195,17 +205,21 @@ app.post('/register', (req, res) => {
   //   }//if there is a matching user
   //     //redirect to /register
   // })
-  const userData = { username: req.body.username, password: req.body.password }
+  let userData = { username: req.body.username, password: req.body.password }
   console.log('hit register endpoint')
-  registerGetUser(userData.username).then((user) => {
+  getUser(userData.username).then((user) => {
     if (user === null) {
-      insertUser(userData).then((userId) => {
-        req.session.userId = userId;
-        req.session.save(() => {
-          //res.redirect('/home')
-          res.status(200).send('registration successful')
+      bcrypt.hash(userData.password, saltRounds, function (err, hash) {
+        // Store hash in your password DB.
+        //console.log('userdata \n', userData, '\nhashed password \n', hash)
+        insertUser({ username: userData.username, password: hash }).then((userId) => {
+          req.session.userId = userId;
+          req.session.save(() => {
+            //res.redirect('/home')
+            res.status(200).send('registration successful')
+          })
         })
-      })
+      });
     } else {
       res.status(400).send('user already exists')
     }
@@ -233,10 +247,10 @@ app.get('/load', function (req, res) {
   })
 })
 
-app.get('/userCount', function(req, res) {
-  getUserList().then((data)=> {
+app.get('/userCount', function (req, res) {
+  getUserList().then((data) => {
     console.log('did this work?')
-    res.send({stupid: data})
+    res.send({ stupid: data })
   })
 })
 
@@ -297,7 +311,7 @@ const refreshBoxer = function (array, index) {
 // }
 
 const refreshList = function () {
-  getNameList().then((data)=> {
+  getNameList().then((data) => {
     refreshFighter(data, 0)
   })
   setTimeout(refreshList, dayInMS)

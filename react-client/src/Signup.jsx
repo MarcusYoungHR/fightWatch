@@ -23,23 +23,29 @@ class Signup extends React.Component {
   }
 
   submitHandler(endpoint) {
-    $.ajax({
-      url: endpoint,
-      method: 'POST',
-      data: this.state,
-      success: (data)=> {
-        console.log('it woiked')
-        window.location.href = '/home'
-      },
-      error: (err)=> {
-        console.log('oh no \n', err.status)
-        if (err.status === 403) {
-          alert('incorrect username or password')
-        } else if (err.status === 400) {
-          alert('user already exists')
+    var usernameRegex = /^[a-zA-Z0-9]+$/;
+
+    if (this.state.username.length > 0 && this.state.password.length > 0 && this.state.username.match(usernameRegex) !== null) {
+      $.ajax({
+        url: endpoint,
+        method: 'POST',
+        data: this.state,
+        success: (data)=> {
+          console.log('it woiked')
+          window.location.href = '/home'
+        },
+        error: (err)=> {
+          console.log('oh no \n', err)
+          if (err.status === 403) {
+            alert(err.responseText)
+          } else if (err.status === 400) {
+            alert('user already exists')
+          }
         }
-      }
-    })
+      })
+    } else {
+      alert('please enter valid username and password')
+    }
   }
 
   render() {

@@ -168,7 +168,7 @@ class App extends React.Component {
             &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Fight Watch is for keeping track of your favorite fighters, it will tell you when the date of their next fight is and who it is against. Originally I made this for myself as I could not keep track of every athlete I wanted to follow and missed some cruicial fights and then I fell in love with the project. <br></br>
             <strong>What technologies are used?</strong> <br></br>
             &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; For the frontend I'm using React, Bootstrap, CSS, Jquery, and HTML.<br></br>
-            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; On the backend I'm using Express, Express-session, AWS-SDK, Custom Google Search API, Cheerio, Fetch, Webpack and Sequelize with a MySQL database.<br></br>
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; On the backend I'm using Express, Express-session, AWS-SDK, bcrypt, Custom Google Search API, Cheerio, Fetch, Webpack and Sequelize with a MySQL database.<br></br>
             &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; This site is hosted using EC2 and the images are stored in an S3 bucket.<br></br>
             <strong>How does it work?</strong><br></br>
             &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; I'll do my best to keep this brief. When a user enters a fighter's name it hits my search endpoint. Eventually the fighter's data is scraped from an MMA website (Sherdog) but I have a series of optimizations inplace to try to avoid that if at all possible.<br></br>

@@ -145,7 +145,7 @@ const insertBoxer = function (obj, sessId) {
     })
   }).catch((err) => {
     console.log('error inserting boxer \n'); //maybe start console logging error here again
-    return Fighter.findOne({ where: { name: obj.name } }).then((fighterData) => {
+    return Boxer.findOne({ where: { name: obj.name } }).then((fighterData) => {
       return associateBoxer(fighterData, sessId)
     })
   })
@@ -191,7 +191,7 @@ const getFighters = function (sessId) {
       }
     }]
   }).then((data) => {
-    //console.log(JSON.parse(JSON.stringify(data, null, 2)))
+    console.log(JSON.parse(JSON.stringify(data, null, 2)))
     return [JSON.parse(JSON.stringify(data, null, 2)).Fighters, JSON.parse(JSON.stringify(data, null, 2)).Boxers]
   }).catch((err) => {
     console.log('getFighters err \n', err)
@@ -280,8 +280,8 @@ const insertUser = function (user) {
   })
 }
 
-const registerGetUser = function (username) {
-  return User.findOne({ where: { username: username } }).then((user) => {
+const getUser = function (username) {
+  return User.findOne({ where: { username: username }, raw: true }).then((user) => {
     if (user === null) {
       console.log('no user found')
       return null
@@ -332,7 +332,7 @@ module.exports = {
   removeBoxer,
   getNameList,
   insertUser,
-  registerGetUser,
+  getUser,
   loginGetUser,
   getSingleFighter,
   getSingleBoxer,
