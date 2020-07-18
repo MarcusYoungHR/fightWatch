@@ -1,13 +1,14 @@
 import React from 'react';
 import ReactModal from 'react-modal';
+import '../../dist/styles.css'
 
 const RecruiterModal = (props) => (
   <ReactModal /*isOpen={this.state.test === 2} onAfterOpen={this.getUserCount}*/ isOpen={props.isOpen} onAfterOpen={props.onAfterOpen} style={{
     overlay: { zIndex: '20' },
-    content: { backgroundColor: 'rgba(204, 204, 204, 0.8)' }
+    content: { backgroundColor: 'rgba(29, 22, 22, 0.8)', color: 'rgb(230, 230, 230)' }
   }}>
     <span>
-      <button className='btn btn-dark' onClick={() => {
+      <button className='btn btn-danger test' onClick={() => {
         props.closeModal()
       }}>X</button> <p style={{ float: 'right', fontSize: '1.5em' }}>There are currently <strong>{props.users}</strong> users signed up!</p>
     </span>

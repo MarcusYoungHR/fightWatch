@@ -13,9 +13,9 @@ const ListItem = (props) => {
             <h5 className="card-title">{props.item.name}</h5>
             <p className="card-text">Fighting vs {props.item.next_opponent} on {props.item.next_fight}</p>
           </div>
-          <button id={props.item.name} className="btn btn-dark" onClick={(event) => {
+          <button id={props.item.name} className="btn btn-danger test" onClick={(event) => {
             props.removeHandler(event.target.id)
-          }}>Remove</button>
+          }} style = {{/*backgroundColor: 'rgb(138, 3, 3)'*/}}>Remove</button>
 
       </div>
     </div>

@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 import ReactModal from 'react-modal';
 import $ from 'jquery';
 import List from './components/List.jsx';
-import '../dist/styles.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
+import '../dist/styles.css'
 import ListBoxer from './components/ListBoxer.jsx'
 import RecruiterModal from './components/RecruiterModal.jsx'
 
@@ -27,30 +27,15 @@ class App extends React.Component {
     this.removeBoxer = this.removeBoxer.bind(this)
     this.closeModal = this.closeModal.bind(this)
     this.getUserCount = this.getUserCount.bind(this)
+    this.dateSorter = this.dateSorter.bind(this)
   }
 
   componentDidMount() {
     $.ajax({
       url: '/load',
       success: (data) => {
-        data[0] = data[0].sort((a, b) => {
-          if (a.next_fight === 'TBA') {
-            return 1
-          }
-          if (b.next_fight === 'TBA') {
-            return -1
-          }
-          return new Date(a.next_fight) - new Date(b.next_fight)
-        })
-        data[1] = data[1].sort((a, b) => {
-          if (a.next_fight === 'TBA') {
-            return 1
-          }
-          if (b.next_fight === 'TBA') {
-            return -1
-          }
-          return new Date(a.next_fight) - new Date(b.next_fight)
-        })
+        data[0] = this.dateSorter(data[0])
+        data[1] = this.dateSorter(data[1])
         console.log('component did mount data: \n', data)
 
         this.setState({
@@ -71,14 +56,32 @@ class App extends React.Component {
     })
   }
 
+  dateSorter(arr) {
+    return arr.sort((a, b) => {
+      if (a.next_fight === 'TBA') {
+        return 1
+      }
+      if (b.next_fight === 'TBA') {
+        return -1
+      }
+      return new Date(a.next_fight) - new Date(b.next_fight)
+    })
+  }
+
   onSubmit() {
     console.log('searching for ufc')
     $.ajax({
       url: '/search',
       data: { fighter: this.state.fighter },
       success: (data) => {
-        console.log('successfully submitted fighter', this.state)
-        this.componentDidMount();
+        console.log('successfully submitted fighter', this.state, '\ndata\n', data)
+        let tempArr = this.state.fighters.slice()
+        tempArr.push(data)
+        tempArr = this.dateSorter(tempArr)
+        this.setState((prevState)=> (
+          {fighters: tempArr}
+        ))
+        //this.componentDidMount();
       },
       error: (err) => {
         console.log('error in search get request: \n', err)
@@ -94,7 +97,12 @@ class App extends React.Component {
       data: { fighter: this.state.fighter },
       success: (data) => {
         console.log('successfully submitted boxer', data)
-        this.componentDidMount();
+        let tempArr = this.state.boxers.slice()
+        tempArr.push(data)
+        tempArr = this.dateSorter(tempArr)
+        this.setState((prevState)=> (
+          {boxers: tempArr}
+        ))
       },
       error: (err) => {
         console.log('error in search get request: \n', err)
@@ -153,33 +161,42 @@ class App extends React.Component {
 
     return (
       <div>
-        <RecruiterModal isOpen = {this.state.test === 'pleaseGive'} onAfterOpen = {this.getUserCount} users = {this.state.users} closeModal = {this.closeModal}></RecruiterModal>
-        <p style={{ position: ' absolute', zIndex: '1', right: '10px', marginBottom: '0px', backgroundColor: 'rgb(179, 179, 179)', paddingLeft: '3px', paddingRight: '3px' }}><strong>Currently logged in as {this.state.test} </strong></p>
-        <div className="input-group" style={{ position: ' absolute', zIndex: '1' }}>
-          <div className="input-group-append" id="button-addon4" style={{ margin: '10px' }}>
-            <form action='/logout' method='post'>
-              <button className="btn btn-dark" type="submit">Log Out</button>
-              <button className="btn btn-dark" type="button">Feedback</button>
-            </form>
+        <RecruiterModal isOpen={this.state.test === 'pleaseGive'} onAfterOpen={this.getUserCount} users={this.state.users} closeModal={this.closeModal}></RecruiterModal>
+        <div style={{ position: ' absolute', zIndex: '1', right: '10px', marginBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }}>
+          <p style={{ color: 'rgb(230, 230, 230)', marginBottom: '0px' }}><strong>Currently logged in as {this.state.test} </strong></p>
+          <div className="input-group" >
+            <div className="input-group-append" id="button-addon4" style={{ margin: '10px' }}>
+              <form action='/logout' method='post'>
+                <button className="btn btn-dark" type="submit">Log Out</button>
+                <button className="btn btn-dark" type="button">Feedback</button>
+              </form>
+            </div>
           </div>
+
         </div>
-        <div style={{ backgroundColor: 'rgb(102, 102, 102)', paddingBottom: '10px', paddingTop: '10px', marginBottom: '10px' }}>
+
+
+        <div style={{ backgroundColor: 'rgb(138, 3, 3)', paddingBottom: '10px', paddingTop: '10px', marginBottom: '10px' }}>
+          <span>
+            <h1 style={{ color: 'rgb(230, 230, 230)', fontWeight: 'bold' }}>F I G H T &nbsp;&nbsp;&nbsp; W A T C H</h1>
+          </span>
           <div className='mx-auto' style={{ backgroundColor: 'rgb(242, 242, 242)', width: 'max-content', padding: '10px' }}>
-            <h1 style={{ textAlign: 'center' }}>F I G H T &nbsp;&nbsp;&nbsp; W A T C H</h1>
+
 
             <div className="input-group">
-              <input type="text" className="form-control" placeholder="Fighter name" aria-label="Recipient's username with two button addons" aria-describedby="button-addon4" onChange={(event) => {
+              <input type="text" className="form-control" placeholder="insert fighter name" aria-label="Recipient's username with two button addons" aria-describedby="button-addon4" onChange={(event) => {
                 this.onChange(event.target.value);
               }}></input>
               <div className="input-group-append" id="button-addon4">
                 <button className="btn btn-dark" type="button" onClick={(event) => {
                   event.preventDefault();
-                  this.onBoxerSubmit()
-                }}>Boxing</button>
+                  this.onSubmit()
+                }}>Search UFC</button>
                 <button className="btn btn-dark" type="button" onClick={(event) => {
                   event.preventDefault();
-                  this.onSubmit()
-                }}>UFC</button>
+                  this.onBoxerSubmit()
+                }}>Search Boxing</button>
+
               </div>
             </div>
           </div>

@@ -27,7 +27,8 @@ const scrapeWeb = function (customSearch, name, req, res, getMethod, insertMetho
           } else {
             console.log('spelling error fighter found in database')
             associate(data, req.session.userId).then(() => {
-              res.sendStatus(200)
+              console.log('---------------------------------------------------------------- \n')
+              res.status(200).send(data.dataValues)
             })
           }
         })
@@ -40,8 +41,8 @@ const scrapeWeb = function (customSearch, name, req, res, getMethod, insertMetho
       getMethod(url, function (data) {
         s3Uploader(data.image, data.name, () => {
           data.image = 'https://fightwatchimages.s3.us-east-2.amazonaws.com/' + transposeImgName(data.name)
-          insertMethod(data, req.session.userId).then((data) => {
-            res.sendStatus(200)
+          insertMethod(data, req.session.userId).then((feta) => {
+            res.status(200).send(data)
           });
         }, () => {
           res.sendStatus(400)
@@ -144,7 +145,7 @@ app.get('/search', function (req, res) { //search sherdog for mma fighter
     } else {
       console.log('fighter found in database')
       associateFighter(data, req.session.userId).then(() => {
-        res.end()
+        res.status(200).send(data.dataValues)
       });
     }
   })
@@ -160,7 +161,7 @@ app.get('/boxer', function (req, res) { //search boxrec for boxer
     } else {
       console.log('fighter found in database')
       associateFighter(data, req.session.userId).then(() => {
-        res.end()
+        res.status(200).send(data.dataValues)
       })
     }
   })

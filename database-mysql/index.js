@@ -154,8 +154,8 @@ const insertBoxer = function (obj, sessId) {
 const associateFighter = function (fighterData, sessId) {
   return User.findOne({ where: { id: sessId } }).then((userData) => {
     return userData.addFighter(fighterData)
-  }).then(() => {
-    console.log('associateFighter: successfully associated fighter')
+  }).then(()=> {
+    console.log('successfully associated fighter')
     return
   }).catch((err) => {
     console.log('associateFighter: error associating fighter \n', err)
@@ -166,9 +166,6 @@ const associateFighter = function (fighterData, sessId) {
 const associateBoxer = function (fighterData, sessId) {
   return User.findOne({ where: { id: sessId } }).then((userData) => {
     return userData.addBoxer(fighterData)
-  }).then(() => {
-    console.log('associateBoxer: successfully associated fighter')
-    return
   }).catch((err) => {
     console.log('associateBoxer: error associating fighter \n', err)
     return
@@ -204,7 +201,7 @@ const getSingleFighter = function (fighter) {
       name: fighter.name
     }
   }).then((data) => {
-    console.log('getSingleFighter data: \n', data)
+    console.log('getSingleFighter data: \n')
     return data
   })
 }
