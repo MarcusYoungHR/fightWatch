@@ -22,12 +22,12 @@ module.exports = {
         }
       },
       {
-        test: [/\.css$/],
-        use: ['style-loader', 'css-loader']
-      },
-      {
         test: [/\.jpg$/, /\.png$/, /\.jpeg$/],
         use: ['file-loader']
+      },
+      {
+        test: [/\.css$/],
+        use: ['style-loader', 'css-loader']
       }
     ]
   },

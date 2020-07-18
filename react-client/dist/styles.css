@@ -19,15 +19,17 @@
 .signUpHeader {
   text-align: center;
   font-weight: bolder;
-  margin-bottom: 20px;
+  /* margin-bottom: 10px; */
+  color: rgb(230, 230, 230);
+  font-size: 3em;
 }
 
 .loginForm {
   width: 300px;
-  background-color: rgb(242, 242, 242);
+  background-color: rgb(138, 3, 3);
   margin-top: 10%;
   position: relative;
-  box-shadow: 15px 15px 15px rgb(38, 38, 38);
+  /* box-shadow: 15px 15px 15px rgb(38, 38, 38); */
 }
 
 .loginInput {
@@ -41,7 +43,7 @@
   margin: 0 auto;
   width: 160px;
   height: 160px;
-  background-image: url('images/logo2.png');
+  background-image: url('./images/logo2.png');
   border-radius: 100% 0px;
   transform: rotate(45deg);
 }
@@ -58,4 +60,7 @@
 
 .loginText {
   text-align: center;
+  color: rgb(230, 230, 230);
+  margin-bottom: 10px;
+  padding-bottom: 10px;
 }

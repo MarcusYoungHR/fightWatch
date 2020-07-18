@@ -180,6 +180,7 @@ app.post('/login', (req, res) => {
       bcrypt.compare(password, data.password, function (err, result) {
         if (result == true) {
           req.session.userId = data.id
+          req.session.username = username
           req.session.save(() => {
             //res.redirect('/home')
             res.status(200).send('good job')
@@ -214,6 +215,7 @@ app.post('/register', (req, res) => {
         //console.log('userdata \n', userData, '\nhashed password \n', hash)
         insertUser({ username: userData.username, password: hash }).then((userId) => {
           req.session.userId = userId;
+          req.session.username = userData.username
           req.session.save(() => {
             //res.redirect('/home')
             res.status(200).send('registration successful')
@@ -242,7 +244,7 @@ app.get('/home', redirectLogin, (req, res) => {
 app.get('/load', function (req, res) {
   //console.log(req.session)
   getFighters(req.session.userId).then(function (data) {
-    data.push(req.session.userId)
+    data.push(req.session.username)
     res.send(data);
   })
 })

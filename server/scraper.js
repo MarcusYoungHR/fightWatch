@@ -97,7 +97,9 @@ module.exports.SDGetFighter = function (url, callback) {
       });
       // Fighter image
       fighter.image = 'https://www.sherdog.com' + $(".profile_image.photo").attr("src");
-      //console.log('fighter image \n', fighter.image)
+      console.log('fighter image \n', fighter.image)
+
+      
 
       if (!fighter.next_fight) {
         fighter.next_fight = 'TBA'

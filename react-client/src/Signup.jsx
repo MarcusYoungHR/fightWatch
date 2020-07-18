@@ -53,11 +53,15 @@ class Signup extends React.Component {
     return (
       <div>
 
-        <div className='eyeShape'></div>
+
 
         <div className='mx-auto loginForm'>
 
-          <h1 className='signUpHeader'>Login</h1>
+        {/* <div className='eyeShape'></div> */}
+
+          <h1 className='signUpHeader'>Fight Watch</h1>
+
+          <img className = 'mx-auto' src='./images/logo2.png'  style={{width: '100px', display: 'block'}}></img>
 
           <form>
 
@@ -79,7 +83,7 @@ class Signup extends React.Component {
             <button className="btn btn-dark registerBtn" onClick ={(event)=> {
               event.preventDefault()
               this.submitHandler('/register')
-            }}> Register </button>
+            }}> Sign Up </button>
 
           </form>
           <p className='loginText'>Don't have an account? Registering is easy! Simply choose a name and password and hit register. No email verification or password complexity required.</p>
