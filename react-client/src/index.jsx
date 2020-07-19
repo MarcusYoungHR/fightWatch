@@ -170,7 +170,7 @@ class App extends React.Component {
             </div>
 
             <div className='col'>
-              <div className='mx-auto' style={{ backgroundColor: 'rgb(242, 242, 242)', width: 'max-content', padding: '10px' }}>
+              <div className='mx-auto' style={{width: 'max-content', padding: '10px' }}>
                 <div className="input-group">
                   <input type="text" className="form-control" placeholder="insert fighter name" aria-label="Recipient's username with two button addons" aria-describedby="button-addon4" onChange={(event) => {
                     this.onChange(event.target.value);
