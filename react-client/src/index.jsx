@@ -78,8 +78,8 @@ class App extends React.Component {
         let tempArr = this.state.fighters.slice()
         tempArr.push(data)
         tempArr = this.dateSorter(tempArr)
-        this.setState((prevState)=> (
-          {fighters: tempArr}
+        this.setState((prevState) => (
+          { fighters: tempArr }
         ))
         //this.componentDidMount();
       },
@@ -100,8 +100,8 @@ class App extends React.Component {
         let tempArr = this.state.boxers.slice()
         tempArr.push(data)
         tempArr = this.dateSorter(tempArr)
-        this.setState((prevState)=> (
-          {boxers: tempArr}
+        this.setState((prevState) => (
+          { boxers: tempArr }
         ))
       },
       error: (err) => {
@@ -162,41 +162,44 @@ class App extends React.Component {
     return (
       <div>
         <RecruiterModal isOpen={this.state.test === 'pleaseGive'} onAfterOpen={this.getUserCount} users={this.state.users} closeModal={this.closeModal}></RecruiterModal>
-        <div style={{ position: ' absolute', zIndex: '1', right: '10px', marginBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }}>
-          <p style={{ color: 'rgb(230, 230, 230)', marginBottom: '0px' }}><strong>Currently logged in as {this.state.test} </strong></p>
-          <div className="input-group" >
-            <div className="input-group-append" id="button-addon4" style={{ margin: '10px' }}>
-              <form action='/logout' method='post'>
-                <button className="btn btn-dark" type="submit">Log Out</button>
-                <button className="btn btn-dark" type="button">Feedback</button>
-              </form>
+
+        <div className='container-fluid' style={{ backgroundColor: 'rgb(138, 3, 3)', paddingBottom: '10px', paddingTop: '10px', marginBottom: '10px' }}>
+          <div className='row'>
+            <div className='col'>
+              <h1 style={{ color: 'rgb(230, 230, 230)', fontWeight: 'bold' }}>F I G H T &nbsp;&nbsp;&nbsp; W A T C H</h1>
             </div>
-          </div>
 
-        </div>
+            <div className='col'>
+              <div className='mx-auto' style={{ backgroundColor: 'rgb(242, 242, 242)', width: 'max-content', padding: '10px' }}>
+                <div className="input-group">
+                  <input type="text" className="form-control" placeholder="insert fighter name" aria-label="Recipient's username with two button addons" aria-describedby="button-addon4" onChange={(event) => {
+                    this.onChange(event.target.value);
+                  }}></input>
+                  <div className="input-group-append" id="button-addon4">
+                    <button className="btn btn-dark" type="button" onClick={(event) => {
+                      event.preventDefault();
+                      this.onSubmit()
+                    }}>Search UFC</button>
+                    <button className="btn btn-dark" type="button" onClick={(event) => {
+                      event.preventDefault();
+                      this.onBoxerSubmit()
+                    }}>Search Boxing</button>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-
-        <div style={{ backgroundColor: 'rgb(138, 3, 3)', paddingBottom: '10px', paddingTop: '10px', marginBottom: '10px' }}>
-          <span>
-            <h1 style={{ color: 'rgb(230, 230, 230)', fontWeight: 'bold' }}>F I G H T &nbsp;&nbsp;&nbsp; W A T C H</h1>
-          </span>
-          <div className='mx-auto' style={{ backgroundColor: 'rgb(242, 242, 242)', width: 'max-content', padding: '10px' }}>
-
-
-            <div className="input-group">
-              <input type="text" className="form-control" placeholder="insert fighter name" aria-label="Recipient's username with two button addons" aria-describedby="button-addon4" onChange={(event) => {
-                this.onChange(event.target.value);
-              }}></input>
-              <div className="input-group-append" id="button-addon4">
-                <button className="btn btn-dark" type="button" onClick={(event) => {
-                  event.preventDefault();
-                  this.onSubmit()
-                }}>Search UFC</button>
-                <button className="btn btn-dark" type="button" onClick={(event) => {
-                  event.preventDefault();
-                  this.onBoxerSubmit()
-                }}>Search Boxing</button>
-
+            <div className='col'>
+              <div style={{float: 'right'}}>
+                <p style={{ color: 'rgb(230, 230, 230)', marginBottom: '0px' }}><strong>Currently logged in as {this.state.test} </strong></p>
+                <div className="input-group" >
+                  <div className="input-group-append" id="button-addon4" style={{ margin: '10px' }}>
+                    <form action='/logout' method='post'>
+                      <button className="btn btn-dark" type="submit">Log Out</button>
+                      <button className="btn btn-dark" type="button">Feedback</button>
+                    </form>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -206,6 +209,7 @@ class App extends React.Component {
           <div className="row">
             <List items={this.state.fighters} removeHandler={this.removeHandler}></List>
           </div>
+
           <div className="row">
             <ListBoxer items={this.state.boxers} removeHandler={this.removeBoxer}></ListBoxer>
           </div>
