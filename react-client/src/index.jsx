@@ -7,6 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import '../dist/styles.css'
 import ListBoxer from './components/ListBoxer.jsx'
 import RecruiterModal from './components/RecruiterModal.jsx'
+import FeedbackModal from './components/FeedbackModal.jsx'
 
 
 class App extends React.Component {
@@ -17,7 +18,9 @@ class App extends React.Component {
       boxers: [],
       fighter: '',
       test: '',
-      users: 0
+      users: 0,
+      message: '',
+      feedBack: false
     }
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
@@ -28,6 +31,8 @@ class App extends React.Component {
     this.closeModal = this.closeModal.bind(this)
     this.getUserCount = this.getUserCount.bind(this)
     this.dateSorter = this.dateSorter.bind(this)
+    this.messageHandler = this.messageHandler.bind(this)
+    this.feedbackSubmit = this.feedbackSubmit.bind(this)
   }
 
   componentDidMount() {
@@ -141,7 +146,9 @@ class App extends React.Component {
 
   closeModal() {
     this.setState({
-      test: 'Recruiter'
+      test: 'Recruiter',
+      feedBack: false,
+      message: ''
     })
   }
 
@@ -157,20 +164,46 @@ class App extends React.Component {
     })
   }
 
+  messageHandler(value) {
+    this.setState({
+      message: value
+    })
+  }
+
+  feedbackSubmit() {
+    $.ajax({
+      url: '/feedback',
+      method: 'POST',
+      data: {message: this.state.message},
+      success: (data)=> {
+        this.setState({
+          message: '',
+          feedBack: false
+        })
+      }
+    })
+  }
+
   render() {
 
     return (
       <div>
         <RecruiterModal isOpen={this.state.test === 'pleaseGive'} onAfterOpen={this.getUserCount} users={this.state.users} closeModal={this.closeModal}></RecruiterModal>
 
+        <FeedbackModal isOpen={this.state.feedBack} message={this.state.message} closeModal={this.closeModal} changeHandler={this.messageHandler} submitHandler={this.feedbackSubmit}></FeedbackModal>
+
         <div className='container-fluid' style={{ backgroundColor: 'rgb(138, 3, 3)', paddingBottom: '10px', paddingTop: '10px', marginBottom: '10px' }}>
           <div className='row'>
             <div className='col'>
-              <h1 style={{ color: 'rgb(230, 230, 230)', fontWeight: 'bold' }}>F I G H T &nbsp;&nbsp;&nbsp; W A T C H</h1>
+
+                <h1 style={{ color: 'rgb(230, 230, 230)', fontWeight: 'bold', display: 'inline-block', transform: 'translateY(30%)' }}>FIGHT &nbsp; WATCH</h1>
+                <img src='./images/logo2.png' style={{ width: '4em', display: 'inline-block'}}></img>
+
+
             </div>
 
             <div className='col'>
-              <div className='mx-auto' style={{width: 'max-content', padding: '10px' }}>
+              <div className='mx-auto' style={{ width: 'max-content', padding: '10px', transform: 'translateY(20%)' }}>
                 <div className="input-group">
                   <input type="text" className="form-control" placeholder="insert fighter name" aria-label="Recipient's username with two button addons" aria-describedby="button-addon4" onChange={(event) => {
                     this.onChange(event.target.value);
@@ -190,13 +223,18 @@ class App extends React.Component {
             </div>
 
             <div className='col'>
-              <div style={{float: 'right'}}>
+              <div style={{ float: 'right' }}>
                 <p style={{ color: 'rgb(230, 230, 230)', marginBottom: '0px' }}><strong>Currently logged in as {this.state.test} </strong></p>
                 <div className="input-group" >
                   <div className="input-group-append" id="button-addon4" style={{ margin: '10px' }}>
                     <form action='/logout' method='post'>
                       <button className="btn btn-dark" type="submit">Log Out</button>
-                      <button className="btn btn-dark" type="button">Feedback</button>
+                      <button className="btn btn-dark" type="button" onClick={(event)=> {
+                        event.preventDefault()
+                        this.setState({
+                          feedBack: true
+                        })
+                      }}>Feedback</button>
                     </form>
                   </div>
                 </div>

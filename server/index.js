@@ -5,7 +5,7 @@ const request = require('request');
 const { SDGetBoxer, SDGetFighter } = require('./scraper.js');
 var cookieParser = require('cookie-parser');
 var expressSession = require('express-session');
-const { insertFighter, insertBoxer, getFighters, removeFighter, removeBoxer, getNameList, insertUser, getUser, loginGetUser, getSingleFighter, getSingleBoxer, associateFighter, associateBoxer, updateFighter, updateBoxer, getBoxerList, getUserList } = require('../database-mysql/index.js')
+const { insertFighter, insertBoxer, getFighters, removeFighter, removeBoxer, getNameList, insertUser, getUser, loginGetUser, getSingleFighter, getSingleBoxer, associateFighter, associateBoxer, updateFighter, updateBoxer, getBoxerList, getUserList, insertMessage } = require('../database-mysql/index.js')
 const path = require('path')
 const { downloadImg, transposeName, capitalizeWords, transposeImgName } = require('./utils.js')
 const { s3Uploader } = require('./s3Upload.js')
@@ -27,7 +27,7 @@ const scrapeWeb = function (customSearch, name, req, res, getMethod, insertMetho
           } else {
             console.log('spelling error fighter found in database')
             associate(data, req.session.userId).then(() => {
-              console.log('---------------------------------------------------------------- \n')
+
               res.status(200).send(data.dataValues)
             })
           }
@@ -40,7 +40,12 @@ const scrapeWeb = function (customSearch, name, req, res, getMethod, insertMetho
       console.log('made it this far \n', url)
       getMethod(url, function (data) {
         s3Uploader(data.image, data.name, () => {
-          data.image = 'https://fightwatchimages.s3.us-east-2.amazonaws.com/' + transposeImgName(data.name)
+          //console.log('s3uploader image \n', data.image)
+          if (data.image == 'https://www.sherdog.com/image_crop/200/300/_images/fighter_large_default.jpg') {
+            data.image = 'https://fightwatchimages.s3.us-east-2.amazonaws.com/noimage.png'
+          } else {
+            data.image = 'https://fightwatchimages.s3.us-east-2.amazonaws.com/' + transposeImgName(data.name)
+          }
           insertMethod(data, req.session.userId).then((feta) => {
             res.status(200).send(data)
           });
@@ -268,6 +273,14 @@ app.delete('/search', function (req, res) { //delete fighter from database
     res.end();
   })
 })
+
+app.post('/feedback', (req, res)=> {
+  //console.log(req.body.feedback)
+  insertMessage(req.body).then(()=> {
+    res.end()
+  })
+})
+
 //            ms     s    m    h
 let dayInMS = 1000 * 60 * 60 * 24
 

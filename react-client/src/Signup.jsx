@@ -1,8 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
-import '../dist/styles.css'
+
 import 'bootstrap/dist/css/bootstrap.min.css';
+import '../dist/styles.css'
+import SignupModal from './components/SignupModal.jsx'
 
 
 class Signup extends React.Component {
@@ -10,15 +12,23 @@ class Signup extends React.Component {
     super(props);
     this.state = {
       username: '',
-      password: ''
+      password: '',
+      modal: false
     }
     this.changeHandler = this.changeHandler.bind(this)
     this.submitHandler = this.submitHandler.bind(this)
+    this.closeModal = this.closeModal.bind(this)
   }
 
   changeHandler(entry, val) {
     this.setState({
       [entry]: val
+    }, ()=> {console.log(this.state)})
+  }
+
+  closeModal() {
+    this.setState({
+      modal: false
     })
   }
 
@@ -53,7 +63,7 @@ class Signup extends React.Component {
     return (
       <div>
 
-
+        <SignupModal isOpen={this.state.modal} closeModal={this.closeModal} changeHandler={this.changeHandler} submitHandler={this.submitHandler}></SignupModal>
 
         <div className='mx-auto loginForm'>
 
@@ -61,11 +71,11 @@ class Signup extends React.Component {
 
           <h1 className='signUpHeader'>Fight Watch</h1>
 
-          <img className = 'mx-auto' src='./images/logo2.png'  style={{width: '100px', display: 'block'}}></img>
+          <img className = 'mx-auto' src='images/logo2.png'  style={{width: '100px', display: 'block'}}></img>
 
           <form>
 
-            <input className='loginInput' type='text' placeholder='user name' id='username' name='username' onChange={(event) => {
+            <input className='loginInput' type='text' placeholder='username' id='username' name='username' onChange={(event) => {
               this.changeHandler('username', event.target.value)
             }}>
             </input>
@@ -82,11 +92,14 @@ class Signup extends React.Component {
 
             <button className="btn btn-dark registerBtn" onClick ={(event)=> {
               event.preventDefault()
-              this.submitHandler('/register')
+              // this.submitHandler('/register')
+              this.setState({
+                modal: true
+              })
             }}> Sign Up </button>
 
           </form>
-          <p className='loginText'>Don't have an account? Registering is easy! Simply choose a name and password and hit register. No email verification or password complexity required.</p>
+          <p className='loginText'>Don't have an account? Registering is easy! Simply choose a name and password. No email verification or password complexity required.</p>
         </div>
 
       </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactModal from 'react-modal';
-import '../../dist/styles.css'
+
 
 const RecruiterModal = (props) => (
   <ReactModal /*isOpen={this.state.test === 2} onAfterOpen={this.getUserCount}*/ isOpen={props.isOpen} onAfterOpen={props.onAfterOpen} style={{
@@ -27,7 +27,6 @@ const RecruiterModal = (props) => (
             &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; If the fighter is not present then I use a custom google search with only Sherdog indexed. Using a custom Google search allows me to bypass having to interact with Sherdogs search feature programmatically; which proved troublesome in my original attempts. If google thinks there are any spelling errors in the fighter name I then query my database again to see if the fighter's name correctly spelled is present in my database. This may seem like an unnecessary step but it is actually optimal as scraping the web is quite a lengthy operation. This function is also helpful as it allows me to borrow Google's spellcheck for proper nouns algorithm istead of having to write my own. So may database searching has a defacto spellcheck built into it and Google is doing all the work for me :)<br></br>
             &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; If yet again the fighter is not present in my databse then I make another call to the custom search api this time with the corrected spelling. This returns a number of links (as Google does) and the first link will ALWAYS be a fighter profile. I then make a request to this link and scrape the needed data with Cheerio. During this process, the fighter's image is uploaded straight to an S3 bucket from Sherdog. Despite this being only one sentence, it was actually a HUGE optimization from the previous method (download image, upload to s3, delete image) and took quite a bit of research to figure out. <br></br>
             &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Now that the data has been retrieved it's entered into my "Fighters" table and is associated with the current user. Upon completing the request the component is rerendered and the new fighter is displayed. During the rendering process the fighters are sorted by the date of their next fight, first to last. I have a function running on an infinite loop that is invoked every 24 hours that goes through the list of all the fighters in my database and updates their information. Of course there is more going on, with using sessions to keep track of which account is logged in and how I query the join table and EC2 and so forth but going into detail about all that would be a mouthful that I'd prefer to save for the interview! Thank you again for visiting my site and I hope you like it!
-
           </p>
   </ReactModal>
 )

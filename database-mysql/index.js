@@ -84,9 +84,21 @@ var users = {
   }
 }
 
+var messages = {
+  id: {
+    type: Sequelize.INTEGER,
+    autoIncrement: true,
+    primaryKey: true
+  },
+  message: {
+    type: Sequelize.STRING(1000)
+  }
+}
+
 const Boxer = sequelize.define('Boxers', boxers)
 const Fighter = sequelize.define('Fighters', model)
 const User = sequelize.define('Users', users);
+const Feedback = sequelize.define('Feeback', messages)
 
 Fighter.belongsToMany(User, { through: 'UserFighter' })
 User.belongsToMany(Fighter, { through: 'UserFighter' })
@@ -98,6 +110,12 @@ User.belongsToMany(Boxer, { through: 'UserBoxer' })
 sequelize.sync()
 // sequelize.sync({ force: true }) //i think force:true drops tables
 //creates the table if it doesn't exist
+
+const insertMessage = function(message) {
+  return Feedback.create(message).catch((err)=> {
+    console.log('error inserting feedback \n', err)
+  })
+}
 
 const insertFighter = function (obj, sessId) {
   return Fighter.create(obj, { returning: true }).then((fighterData) => {
@@ -338,6 +356,7 @@ module.exports = {
   updateBoxer,
   updateFighter,
   getBoxerList,
-  getUserList
+  getUserList,
+  insertMessage
 }
 
