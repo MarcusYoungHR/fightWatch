@@ -1,1 +1,4 @@
 node_modules
+react-client/dist/signup.js
+react-client/dist/app.js
+react-client/dist/images
