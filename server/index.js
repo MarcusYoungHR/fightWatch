@@ -97,7 +97,7 @@ app.use(expressSession({
 
 app.use(express.static(__dirname + '/../react-client/dist'));
 
-app.use(favicon(path.resolve('react-client/dist/images/favicon.ico')))
+app.use(favicon(path.resolve('react-client/dist/favicon.ico')))
 
 //console.log(path.resolve('react-client/dist/images/favicon.ico'))
 
