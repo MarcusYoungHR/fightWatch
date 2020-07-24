@@ -220,7 +220,7 @@ class App extends React.Component {
             <div className='col'>
 
               <h1 className='fightHeader' >FIGHT &nbsp; WATCH</h1>
-              <img src='./images/logo2.png' className='indexLogo'></img>
+              <img src='http://dust0ohbmv3v2.cloudfront.netlogo2.png' className='indexLogo'></img>
 
 
             </div>
