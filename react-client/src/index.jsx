@@ -129,13 +129,21 @@ class App extends React.Component {
     })
   }
 
-  removeHandler(name) {
+  removeHandler(name, endpoint, arr) {
     $.ajax({
-      url: '/search',
+      url: endpoint,
       method: 'DELETE',
       data: { fighter: name },
       success: () => {
-        this.componentDidMount();
+        let index = this.state[arr].findIndex((elem)=> {
+          console.log(typeof elem.name)
+          return elem.name == name
+        })
+        let tempArr = this.state[arr].slice()
+        tempArr.splice(index, 1)
+        this.setState({
+          [arr]: tempArr
+        })
       }
     })
   }
@@ -306,7 +314,7 @@ class App extends React.Component {
           </div>
 
           <div className="row">
-            <ListBoxer items={this.state.boxers} removeHandler={this.removeBoxer}></ListBoxer>
+            <ListBoxer items={this.state.boxers} removeHandler={this.removeHandler}></ListBoxer>
           </div>
         </div>
       </div>
