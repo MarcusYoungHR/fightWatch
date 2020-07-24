@@ -4,11 +4,11 @@ import ReactModal from 'react-modal';
 import $ from 'jquery';
 import List from './components/List.jsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import '../dist/styles.css'
+
 import ListBoxer from './components/ListBoxer.jsx'
 import RecruiterModal from './components/RecruiterModal.jsx'
 import FeedbackModal from './components/FeedbackModal.jsx'
-
+import '../dist/styles.css'
 
 class App extends React.Component {
   constructor(props) {
@@ -20,7 +20,8 @@ class App extends React.Component {
       test: '',
       users: 0,
       message: '',
-      feedBack: false
+      feedBack: false,
+      dropDown: ''
     }
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
@@ -84,7 +85,10 @@ class App extends React.Component {
         tempArr.push(data)
         tempArr = this.dateSorter(tempArr)
         this.setState((prevState) => (
-          { fighters: tempArr }
+          {
+            fighters: tempArr,
+            fighter: ''
+          }
         ))
         //this.componentDidMount();
       },
@@ -106,7 +110,10 @@ class App extends React.Component {
         tempArr.push(data)
         tempArr = this.dateSorter(tempArr)
         this.setState((prevState) => (
-          { boxers: tempArr }
+          {
+            boxers: tempArr,
+            fighter: ''
+          }
         ))
       },
       error: (err) => {
@@ -171,48 +178,56 @@ class App extends React.Component {
   }
 
   feedbackSubmit() {
-    $.ajax({
-      url: '/feedback',
-      method: 'POST',
-      data: {message: this.state.message},
-      success: (data)=> {
-        this.setState({
-          message: '',
-          feedBack: false
-        })
-      }
-    })
+    if (this.state.message.length > 1000) {
+      alert('Limit 1000 characters, shorten your message')
+    } else {
+      $.ajax({
+        url: '/feedback',
+        method: 'POST',
+        data: { message: this.state.message },
+        success: (data) => {
+          this.setState({
+            message: '',
+            feedBack: false
+          })
+        }
+      })
+    }
   }
 
   render() {
 
     return (
-      <div>
+      <div onClick = {()=> {
+        if (this.state.dropDown == 'show') {
+          this.setState({dropDown: ''})
+        }
+      }}>
         <RecruiterModal isOpen={this.state.test === 'pleaseGive'} onAfterOpen={this.getUserCount} users={this.state.users} closeModal={this.closeModal}></RecruiterModal>
 
         <FeedbackModal isOpen={this.state.feedBack} message={this.state.message} closeModal={this.closeModal} changeHandler={this.messageHandler} submitHandler={this.feedbackSubmit}></FeedbackModal>
 
-        <div className='container-fluid' style={{ backgroundColor: 'rgb(138, 3, 3)', paddingBottom: '10px', paddingTop: '10px', marginBottom: '10px' }}>
+        <div className='container-fluid indexHeader' >
           <div className='row'>
             <div className='col'>
 
-                <h1 style={{ color: 'rgb(230, 230, 230)', fontWeight: 'bold', display: 'inline-block', transform: 'translateY(30%)' }}>FIGHT &nbsp; WATCH</h1>
-                <img src='./images/logo2.png' style={{ width: '4em', display: 'inline-block'}}></img>
+              <h1 className='fightHeader' >FIGHT &nbsp; WATCH</h1>
+              <img src='./images/logo2.png' className='indexLogo'></img>
 
 
             </div>
 
             <div className='col'>
-              <div className='mx-auto' style={{ width: 'max-content', padding: '10px', transform: 'translateY(20%)' }}>
+              <div className='mx-auto headerInput' >
                 <div className="input-group">
-                  <input type="text" className="form-control" placeholder="insert fighter name" aria-label="Recipient's username with two button addons" aria-describedby="button-addon4" onChange={(event) => {
+                  <input type="text" className="form-control" placeholder="insert fighter name" value={this.state.fighter} aria-label="Recipient's username with two button addons" aria-describedby="button-addon4" onChange={(event) => {
                     this.onChange(event.target.value);
                   }}></input>
                   <div className="input-group-append" id="button-addon4">
                     <button className="btn btn-dark" type="button" onClick={(event) => {
                       event.preventDefault();
                       this.onSubmit()
-                    }}>Search UFC</button>
+                    }}>Search MMA</button>
                     <button className="btn btn-dark" type="button" onClick={(event) => {
                       event.preventDefault();
                       this.onBoxerSubmit()
@@ -223,13 +238,13 @@ class App extends React.Component {
             </div>
 
             <div className='col'>
-              <div style={{ float: 'right' }}>
-                <p style={{ color: 'rgb(230, 230, 230)', marginBottom: '0px' }}><strong>Currently logged in as {this.state.test} </strong></p>
+              <div className='class1' >
+                <p className='loggedInAs'><strong>Currently logged in as {this.state.test} </strong></p>
                 <div className="input-group" >
                   <div className="input-group-append" id="button-addon4" style={{ margin: '10px' }}>
                     <form action='/logout' method='post'>
                       <button className="btn btn-dark" type="submit">Log Out</button>
-                      <button className="btn btn-dark" type="button" onClick={(event)=> {
+                      <button className="btn btn-dark" type="button" onClick={(event) => {
                         event.preventDefault()
                         this.setState({
                           feedBack: true
@@ -243,7 +258,49 @@ class App extends React.Component {
           </div>
         </div>
 
-        <div className="container">
+        <div className="container-fluid">
+          <div className='row'>
+            <div className="dropdown">
+              <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onClick={() => {
+                if (this.state.dropDown == 'show') {
+                  this.setState({ dropDown: '' })
+                } else {
+                  this.setState({ dropDown: 'show' })
+                }
+              }}>
+                Sort by
+              </button>
+              <div className={`dropdown-menu ${this.state.dropDown}`} aria-labelledby="dropdownMenuButton">
+                <button className="dropdown-item btn btn-light" href="#" onClick={() => {
+                  let boxArr = this.state.boxers.slice()
+                  let fightArr = this.state.fighters.slice()
+                  boxArr = this.dateSorter(boxArr)
+                  fightArr = this.dateSorter(fightArr)
+                  this.setState({
+                    dropDown: '',
+                    fighters: fightArr,
+                    boxers: boxArr
+                  })
+                }}>Next fight</button>
+                <button className="dropdown-item btn btn-light" href="#" onClick={() => {
+                  let boxArr = this.state.boxers.slice()
+                  let fightArr = this.state.fighters.slice()
+                  boxArr.sort()
+                  fightArr = fightArr.sort((a, b)=> {
+                    if(a.name < b.name) { return -1; }
+                    if(a.name > b.name) { return 1; }
+                    return 0;
+                  })
+                  console.log(fightArr)
+                  this.setState({
+                    dropDown: '',
+                    fighters: fightArr,
+                    boxers: boxArr
+                  }, ()=>{/*console.log(this.state.fighters)*/})
+                }}>Alphabetical</button>
+              </div>
+            </div>
+          </div>
           <div className="row">
             <List items={this.state.fighters} removeHandler={this.removeHandler}></List>
           </div>

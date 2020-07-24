@@ -2,6 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var Sequelize = require('sequelize')
 const request = require('request');
+var favicon = require('serve-favicon')
 const { SDGetBoxer, SDGetFighter } = require('./scraper.js');
 var cookieParser = require('cookie-parser');
 var expressSession = require('express-session');
@@ -42,9 +43,9 @@ const scrapeWeb = function (customSearch, name, req, res, getMethod, insertMetho
         s3Uploader(data.image, data.name, () => {
           //console.log('s3uploader image \n', data.image)
           if (data.image == 'https://www.sherdog.com/image_crop/200/300/_images/fighter_large_default.jpg') {
-            data.image = 'https://fightwatchimages.s3.us-east-2.amazonaws.com/noimage.png'
+            data.image = 'http://dust0ohbmv3v2.cloudfront.net/noimage.png'
           } else {
-            data.image = 'https://fightwatchimages.s3.us-east-2.amazonaws.com/' + transposeImgName(data.name)
+            data.image = 'http://dust0ohbmv3v2.cloudfront.net/' + transposeImgName(data.name)
           }
           insertMethod(data, req.session.userId).then((feta) => {
             res.status(200).send(data)
@@ -67,6 +68,7 @@ const serverSequelize = new Sequelize('fighterDB', 'Marcus', '4815162342Aa!', {
 });
 
 var app = express();
+
 app.use(bodyParser());
 
 //TODO: Optimize registering process by removing registerGetUser
@@ -94,6 +96,10 @@ app.use(expressSession({
 }))
 
 app.use(express.static(__dirname + '/../react-client/dist'));
+
+app.use(favicon(path.resolve('react-client/dist/images/favicon.ico')))
+
+//console.log(path.resolve('react-client/dist/images/favicon.ico'))
 
 const redirectLogin = (req, res, next) => { //custom middleware i define
   if (!req.session.userId) { //true if session object is uninitialized, ie we didnt put any data on the sessions object. checking to see if the user is logged in or not

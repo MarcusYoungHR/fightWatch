@@ -20,7 +20,7 @@ const RecruiterModal = (props) => (
       <strong>What technologies are used?</strong> <br></br>
             &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; For the frontend I'm using React, Bootstrap, CSS, Jquery, and HTML.<br></br>
             &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; On the backend I'm using Express, Express-session, AWS-SDK, bcrypt, Custom Google Search API, Cheerio, Fetch, Webpack and Sequelize with a MySQL database.<br></br>
-            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Fightwatch.me is registered with Route 53, the server is ran using EC2 with an Nginx reverse proxy routing traffic and the images are stored in an S3 bucket.<br></br>
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Fightwatch.me is registered with Route 53, the server is ran using EC2 with an Nginx reverse proxy routing traffic and the images and bundles are stored in an S3 bucket which are served and compressed via cloudfront.<br></br>
       <strong>How does it work?</strong><br></br>
             &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; I'll do my best to keep this brief. When a user enters a fighter's name it hits my search endpoint. Eventually the fighter's data is scraped from an MMA website (Sherdog) but I have a series of optimizations inplace to try to avoid that if at all possible.<br></br>
             &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; My database is queried by the fighter's name to see if the information is already present. Each time a fighter is searched, if his information is not already present in the database then it is entered. If the fighter is present then he is simply joined to the user via a join table.<br></br>

@@ -23,12 +23,14 @@ class Signup extends React.Component {
   changeHandler(entry, val) {
     this.setState({
       [entry]: val
-    }, ()=> {console.log(this.state)})
+    })
   }
 
   closeModal() {
     this.setState({
-      modal: false
+      modal: false,
+      username: '',
+      password: ''
     })
   }
 
@@ -71,16 +73,16 @@ class Signup extends React.Component {
 
           <h1 className='signUpHeader'>Fight Watch</h1>
 
-          <img className = 'mx-auto' src='images/logo2.png'  style={{width: '100px', display: 'block'}}></img>
+          <img className = 'mx-auto loginBackground' src='images/logo2.png'  ></img>
 
           <form>
 
-            <input className='loginInput' type='text' placeholder='username' id='username' name='username' onChange={(event) => {
+            <input className='loginInput' type='text' value={this.state.username} placeholder='username' id='username' name='username' onChange={(event) => {
               this.changeHandler('username', event.target.value)
             }}>
             </input>
 
-            <input className='loginInput' type='password' placeholder='password' id='password' name='password' onChange={(event) => {
+            <input className='loginInput' type='password' value={this.state.password} placeholder='password' id='password' name='password' onChange={(event) => {
               this.changeHandler('password', event.target.value)
             }}>
             </input>

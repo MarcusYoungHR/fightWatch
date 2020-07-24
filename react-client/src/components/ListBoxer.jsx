@@ -3,13 +3,11 @@ import ListItemBoxer from './ListItemBoxer.jsx';
 
 const ListBoxer = (props) => (
   <div className='col'>
-    <h4 className="mx-auto" style={{ textAlign: 'center', width: '14rem', color: 'rgb(230, 230, 230)', marginBottom: '10px', borderRadius: '3px' }}> BOXERS </h4>
+    <h4 className="mx-auto cardHeader"> BOXERS </h4>
     <p className='mx-auto' style={{textAlign: 'center', color: 'rgb(230, 230, 230)'}}>Boxing function currently limited, may not work properly</p>
-    <div className="row row-cols-1 row-cols-sm-3 row-cols-lg-5">
-
+    <div className="row row-cols-1 row-cols-sm-3 row-cols-lg-5 row-cols-lg-6 row-cols-xl-7">
       {props.items.map((item, i) => <ListItemBoxer item={item} key={i} removeHandler={props.removeHandler} />)}
     </div>
-
   </div>
 )
 
