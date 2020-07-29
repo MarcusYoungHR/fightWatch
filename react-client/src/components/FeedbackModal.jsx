@@ -14,7 +14,7 @@ const FeedbackModal = (props) => (
     <form className='p-4'>
       <div className="form-group" >
         <label for="exampleFormControlTextarea1">Any feeback or suggestions. If the website is malfunctioning the most useful thing you could give me is the name of the fighter you searched for.</label>
-        <textarea class="form-control" id="exampleFormControlTextarea1" rows="10" onChange={(event) => {
+        <textarea className="form-control" id="exampleFormControlTextarea1" rows="10" onChange={(event) => {
           props.changeHandler(event.target.value)
         }}></textarea>
       </div>

@@ -34,6 +34,7 @@ class App extends React.Component {
     this.dateSorter = this.dateSorter.bind(this)
     this.messageHandler = this.messageHandler.bind(this)
     this.feedbackSubmit = this.feedbackSubmit.bind(this)
+    this.closeFeedBack = this.closeFeedBack.bind(this)
   }
 
   componentDidMount() {
@@ -42,7 +43,7 @@ class App extends React.Component {
       success: (data) => {
         data[0] = this.dateSorter(data[0])
         data[1] = this.dateSorter(data[1])
-        console.log('component did mount data: \n', data)
+        //console.log('component did mount data: \n', data)
 
         this.setState({
           fighters: data[0],
@@ -80,7 +81,7 @@ class App extends React.Component {
       url: '/search',
       data: { fighter: this.state.fighter },
       success: (data) => {
-        console.log('successfully submitted fighter', this.state, '\ndata\n', data)
+        //console.log('successfully submitted fighter', this.state, '\ndata\n', data)
         let tempArr = this.state.fighters.slice()
         tempArr.push(data)
         tempArr = this.dateSorter(tempArr)
@@ -105,7 +106,7 @@ class App extends React.Component {
       url: '/boxer',
       data: { fighter: this.state.fighter },
       success: (data) => {
-        console.log('successfully submitted boxer', data)
+        //console.log('successfully submitted boxer', data)
         let tempArr = this.state.boxers.slice()
         tempArr.push(data)
         tempArr = this.dateSorter(tempArr)
@@ -136,7 +137,7 @@ class App extends React.Component {
       data: { fighter: name },
       success: () => {
         let index = this.state[arr].findIndex((elem)=> {
-          console.log(typeof elem.name)
+          //console.log(typeof elem.name)
           return elem.name == name
         })
         let tempArr = this.state[arr].slice()
@@ -161,7 +162,12 @@ class App extends React.Component {
 
   closeModal() {
     this.setState({
-      test: 'Recruiter',
+      test: 'Recruiter'
+    })
+  }
+
+  closeFeedBack() {
+    this.setState({
       feedBack: false,
       message: ''
     })
@@ -171,7 +177,7 @@ class App extends React.Component {
     $.ajax({
       url: '/userCount',
       success: (data) => {
-        console.log('dkjsdakufba')
+        //console.log('dkjsdakufba')
         this.setState({
           users: data.stupid
         })
@@ -213,14 +219,14 @@ class App extends React.Component {
       }}>
         <RecruiterModal isOpen={this.state.test === 'pleaseGive'} onAfterOpen={this.getUserCount} users={this.state.users} closeModal={this.closeModal}></RecruiterModal>
 
-        <FeedbackModal isOpen={this.state.feedBack} message={this.state.message} closeModal={this.closeModal} changeHandler={this.messageHandler} submitHandler={this.feedbackSubmit}></FeedbackModal>
+        <FeedbackModal isOpen={this.state.feedBack} message={this.state.message} closeModal={this.closeFeedBack} changeHandler={this.messageHandler} submitHandler={this.feedbackSubmit}></FeedbackModal>
 
         <div className='container-fluid indexHeader' >
           <div className='row'>
             <div className='col'>
 
               <h1 className='fightHeader' >FIGHT &nbsp; WATCH</h1>
-              <img src='http://dust0ohbmv3v2.cloudfront.netlogo2.png' className='indexLogo'></img>
+              <img src='http://dust0ohbmv3v2.cloudfront.net/logo2.png' className='indexLogo'></img>
 
 
             </div>
@@ -239,7 +245,7 @@ class App extends React.Component {
                     <button className="btn btn-dark" type="button" onClick={(event) => {
                       event.preventDefault();
                       this.onBoxerSubmit()
-                    }}>Search Boxing</button>
+                    }} disabled>Search Boxing</button>
                   </div>
                 </div>
               </div>

@@ -43,7 +43,7 @@ class Signup extends React.Component {
         method: 'POST',
         data: this.state,
         success: (data)=> {
-          console.log('it woiked')
+          //console.log('it woiked')
           window.location.href = '/home'
         },
         error: (err)=> {
@@ -73,7 +73,7 @@ class Signup extends React.Component {
 
           <h1 className='signUpHeader'>Fight Watch</h1>
 
-          <img className = 'mx-auto loginBackground' src='images/logo2.png'  ></img>
+          <img className = 'mx-auto loginBackground' src='http://dust0ohbmv3v2.cloudfront.net/logo2.png'  ></img>
 
           <form>
 
