@@ -43,9 +43,9 @@ const scrapeWeb = function (customSearch, name, req, res, getMethod, insertMetho
         s3Uploader(data.image, data.name, () => {
           //console.log('s3uploader image \n', data.image)
           if (data.image == 'https://www.sherdog.com/image_crop/200/300/_images/fighter_large_default.jpg') {
-            data.image = 'http://dust0ohbmv3v2.cloudfront.net/noimage.png'
+            data.image = 'https://dust0ohbmv3v2.cloudfront.net/noimage.png'
           } else {
-            data.image = 'http://dust0ohbmv3v2.cloudfront.net/' + transposeImgName(data.name)
+            data.image = 'https://dust0ohbmv3v2.cloudfront.net/' + transposeImgName(data.name)
           }
           insertMethod(data, req.session.userId).then((feta) => {
             res.status(200).send(data)
@@ -358,6 +358,6 @@ const refreshFighter = function (array, index) {
 //
 
 
-//refreshList()
+refreshList()
 //^^^^ uncomment when server is deployed
 
