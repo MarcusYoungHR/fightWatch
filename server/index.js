@@ -358,6 +358,6 @@ const refreshFighter = function (array, index) {
 //
 
 
-refreshList()
+//refreshList()
 //^^^^ uncomment when server is deployed
 

@@ -321,7 +321,7 @@ const loginGetUser = function (user) {
 }
 
 const updateFighter = function(fighter) {
-  const {name, next_fight, next_opponent} = fighter
+  const {name, next_fight, next_opponent, image} = fighter
   return Fighter.update({next_fight: next_fight, next_opponent: next_opponent}, {where: {name: name}})
 }
 

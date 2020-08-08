@@ -226,7 +226,7 @@ class App extends React.Component {
             <div className='col'>
 
               <h1 className='fightHeader' >FIGHT &nbsp; WATCH</h1>
-              <img src='http://dust0ohbmv3v2.cloudfront.net/logo2.png' className='indexLogo'></img>
+              <img src='https://dust0ohbmv3v2.cloudfront.net/logo2.png' className='indexLogo'></img>
 
 
             </div>
@@ -245,7 +245,7 @@ class App extends React.Component {
                     <button className="btn btn-dark" type="button" onClick={(event) => {
                       event.preventDefault();
                       this.onBoxerSubmit()
-                    }} disabled>Search Boxing</button>
+                    }} disabled>Coming Soon!</button>
                   </div>
                 </div>
               </div>

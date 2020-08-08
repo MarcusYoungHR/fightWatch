@@ -42,11 +42,11 @@ class Signup extends React.Component {
         url: endpoint,
         method: 'POST',
         data: this.state,
-        success: (data)=> {
+        success: (data) => {
           //console.log('it woiked')
           window.location.href = '/home'
         },
-        error: (err)=> {
+        error: (err) => {
           console.log('oh no \n', err)
           if (err.status === 403) {
             alert(err.responseText)
@@ -63,19 +63,15 @@ class Signup extends React.Component {
   render() {
 
     return (
-      <div>
+      <div className='mx-auto my-auto w-50' style={{ backgroundColor: 'rgb(138, 3, 3)' }}>
 
         <SignupModal isOpen={this.state.modal} closeModal={this.closeModal} changeHandler={this.changeHandler} submitHandler={this.submitHandler}></SignupModal>
 
-        <div className='mx-auto loginForm'>
+        <h1 className='signUpHeader'>Fight Watch</h1>
 
-        {/* <div className='eyeShape'></div> */}
+        <img className='mx-auto w-25' src='https://dust0ohbmv3v2.cloudfront.net/logo2.png' style={{ display: 'block' }}></img>
 
-          <h1 className='signUpHeader'>Fight Watch</h1>
-
-          <img className = 'mx-auto loginBackground' src='http://dust0ohbmv3v2.cloudfront.net/logo2.png'  ></img>
-
-          <form>
+        {/* <form>
 
             <input className='loginInput' type='text' value={this.state.username} placeholder='username' id='username' name='username' onChange={(event) => {
               this.changeHandler('username', event.target.value)
@@ -100,9 +96,34 @@ class Signup extends React.Component {
               })
             }}> Sign Up </button>
 
-          </form>
-          <p className='loginText'>Don't have an account? Registering is easy! Simply choose a name and password. No email verification or password complexity required.</p>
-        </div>
+          </form> */}
+
+        <form className='mx-3'>
+          <div class="form-group">
+            <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder='username' onChange={(event) => {
+              this.changeHandler('username', event.target.value)
+            }}></input>
+          </div>
+          <div class="form-group">
+            <input type="password" class="form-control" id="exampleInputPassword1" placeholder='password' onChange={(event) => {
+              this.changeHandler('password', event.target.value)
+            }}></input>
+          </div>
+          <button type="submit" class="btn btn-dark" onClick = {(event)=> {
+              event.preventDefault()
+              this.submitHandler('/login')
+            }}>Login</button>
+          <button type="submit" class="btn btn-dark" style={{float: 'right'}} onClick ={(event)=> {
+              event.preventDefault()
+              // this.submitHandler('/register')
+              this.setState({
+                modal: true
+              })
+            }}>Sign Up</button>
+        </form>
+
+        <p className='loginText'>Don't have an account? Registering is easy! Simply choose a name and password. No email verification or password complexity required.</p>
+
 
       </div>
     )

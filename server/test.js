@@ -1,18 +1,37 @@
-const boxrec = require("boxrec").Boxrec;
+const https = require('https')
 
-var buttChug = async function() {
-  const cookieJar = await boxrec.login('marcusisabeast', '4815162342Aa');
+https.get('https://nodejs.org/dist/index.json', (res) => {
+  const { statusCode } = res;
+  const contentType = res.headers['content-type'];
 
-  const gennadyGolovkin = await boxrec.getPersonById(cookieJar, 352);
-  const gennadyGolovkin1 = await boxrec.getPersonById(cookieJar, 1);
-  const gennadyGolovkin2 = await boxrec.getPersonById(cookieJar, 2);
-  const gennadyGolovkin3 = await boxrec.getPersonById(cookieJar, 3);
-  const gennadyGolovkin4 = await boxrec.getPersonById(cookieJar, 4);
-  const gennadyGolovkin5 = await boxrec.getPersonById(cookieJar, 5);
-  const gennadyGolovkin6 = await boxrec.getPersonById(cookieJar, 7);
-  const gennadyGolovkin7 = await boxrec.getPersonById(cookieJar, 8);
-  const gennadyGolovkin8 = await boxrec.getPersonById(cookieJar, 9);
-  try {console.log(gennadyGolovkin.bouts[5].opponent.name);} catch(err) {console.log(err)}
-}
+  let error;
+  // Any 2xx status code signals a successful response but
+  // here we're only checking for 200.
+  if (statusCode !== 200) {
+    error = new Error('Request Failed.\n' +
+                      `Status Code: ${statusCode}`);
+  } else if (!/^application\/json/.test(contentType)) {
+    error = new Error('Invalid content-type.\n' +
+                      `Expected application/json but received ${contentType}`);
+  }
+  if (error) {
+    console.error(error.message);
+    // Consume response data to free up memory
+    res.resume();
+    return;
+  }
 
-buttChug()
+  res.setEncoding('utf8');
+  let rawData = '';
+  res.on('data', (chunk) => { rawData += chunk; });
+  res.on('end', () => {
+    try {
+      const parsedData = JSON.parse(rawData);
+      console.log(parsedData);
+    } catch (e) {
+      console.error(e.message);
+    }
+  });
+}).on('error', (e) => {
+  console.error(`Got error: ${e.message}`);
+});
